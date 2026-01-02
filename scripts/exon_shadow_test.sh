@@ -1,5 +1,23 @@
 
 
+while read i
+do
+t=$(echo $i | awk '{print$1}')
+c=$(echo $i | awk '{print$2,$3}')
+cs=$(awk -v t="$t" '{if($0~t) print$4,$5}' /media/aswin/SCFR/SCFR-main/genes/human/GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf)
+m=$(echo "$cs" | grep "$c")
+if [[ -z $m ]]
+then
+f="multi"
+else
+f="single"
+fi
+echo $t $c $f
+unset t c cs m f
+done < <(awk '$14<2 {print$11,$8,$9}' human_multi_exon.tsv) > check_single_exons_in_multi_scfrs
+
+##########################
+
 bedtools intersect -a scfr.bed -b cds.bed -wo -s > scfr_cds_overlaps.bed
 
 while read scfr 
