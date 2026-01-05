@@ -1196,7 +1196,8 @@ for sp in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
 (
 echo ">"$sp
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/species_wise_exon_shadow_exitron_shell_script.sh $sp
+#/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/species_wise_exon_shadow_exitron_shell_script.sh $sp
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/per_species_run_exon_shadow_exitron.sh $sp
 ) &
 done
 wait
