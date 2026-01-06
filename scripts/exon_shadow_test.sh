@@ -1,5 +1,34 @@
 
 
+
+
+
+#🔹 Step 1: Make fixed genomic windows
+bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan.windows.bed
+awk 'NR>1{print$1,$2,$3,$4,$5,$6}' OFS="\t" ../borangutan_single_exon.tsv > borangutan_single_exon_scfr.bed
+#🔹 Step 2: Intersect BED with windows
+bedtools intersect -a borangutan.windows.bed -b borangutan_single_exon_scfr.bed -wa -wb > window_hits.bed
+#🔹 Step 3: Count + and − per window
+awk '
+{
+  key = $1 FS $2 FS $3
+  if ($9 == "+") plus[key]++
+  else if ($9 == "-") minus[key]++
+}
+END {
+  for (k in plus) {
+    p = plus[k] + 0
+    m = minus[k] + 0
+    if (p + m > 0)
+      print k, p, m, (m - p) / (m + p)
+  }
+}
+' window_hits.bed > window_asymmetry.tsv
+#🔹 Step 4: Extract highly asymmetric windows
+awk '$6 > 0.5 {print}' window_asymmetry.tsv > neg_strand_hotspots.bed
+
+#######################
+
 while read i
 do
 t=$(echo $i | awk '{print$1}')
