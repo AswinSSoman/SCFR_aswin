@@ -1,7 +1,13 @@
 
 
 
-
+Given a 6-column TSV (chr, start, end, plus, minus, asym where asym=(plus−minus)/(plus+minus)),
+write R code that:
+- filters total>0
+- identify regions with strong/moderate plus/minus strand bias & color in plot
+- plots asymmetry vs genomic position with ggplot2, faceted by chromosome
+e.g. input: NC_085930.1 53800000 53900000 8 0 -1
+Return only R code.
 
 #🔹 Step 1: Make fixed genomic windows
 bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan.windows.bed
