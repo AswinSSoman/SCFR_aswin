@@ -1205,6 +1205,24 @@ end_time=$(date +%s) && elapsed_time=$((end_time - start_time))
 echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
 
 
+#Strand asymmetry in total SCFR, CDS & shadow
+
+mkdir /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
+cd /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
+rm all_species_cds_strand_count_asymmetry.tsv  all_species_composite_exon_shadow_strand_count_asymmetry.tsv all_species_multi_exon_shadow_strand_count_asymmetry.tsv all_species_scfr_strand_count_asymmetry.tsv all_species_single_exon_shadow_strand_count_asymmetry.tsv
+
+cd /media/aswin/SCFR/SCFR-main/exon_shadow/
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_coding_exons.bed | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' | sed "s/^/$species /g" | sed 's/[ ]\/\t/g' >> strand_asymmetry/all_species_cds_strand_count_asymmetry.tsv
+awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_scfr_all.bed | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\/\t/g' >> strand_asymmetry/all_species_scfr_strand_count_asymmetry.tsv
+awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_single_exon.tsv | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\/\t/g' >> strand_asymmetry/all_species_single_exon_shadow_strand_count_asymmetry.tsv
+awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_multi_exon.tsv | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\/\t/g' >> strand_asymmetry/all_species_multi_exon_shadow_strand_count_asymmetry.tsv
+awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_composite_exon.tsv | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\/\t/g' >> strand_asymmetry/all_species_composite_exon_shadow_strand_count_asymmetry.tsv
+done
+
+
+
 #Find SCFR exon overlaps (113.083 mins)
 
 	mkdir /media/aswin/SCFR/SCFR-main/exon_shadow
