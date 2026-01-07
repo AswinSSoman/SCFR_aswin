@@ -9,12 +9,37 @@ write R code that:
 e.g. input: NC_085930.1 53800000 53900000 8 0 -1
 Return only R code.
 
+If I have bed file, can I find local regions of high strand asymmetry within chromosome. Count Strand asymmetry (SA) is calculated by equation = (counts in +ve - counts in -ve strand)/(counts in +ve strand - counts in -ve strand).
+SA value close to -1 means -ve strand bias & close to +1 means +ve strand bias. A higher asymmetry is observed in +ve strand of borangutan, but I want to to narrow down to the exact regions contributing to this asymmetry.
+e.g. 
+species  count  strand  count  strand  count_difference  asymmetry
+borangutan  113486  +  51260  -  1  62226  0.377709
+
+e.g.: input bed file to identify local regions of asymmetry
+NC_085930.1	121463	121853	3	1	+
+NC_072373.2	100110165	100110309	-1	1	-
+
 #🔹 Step 1: Make fixed genomic windows
-bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan.windows.bed
-awk 'NR>1{print$1,$2,$3,$4,$5,$6}' OFS="\t" ../borangutan_single_exon.tsv > borangutan_single_exon_scfr.bed
+#bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan.windows.bed
+bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan_windows.bed
+
 #🔹 Step 2: Intersect BED with windows
-bedtools intersect -a borangutan.windows.bed -b borangutan_single_exon_scfr.bed -wa -wb > window_hits.bed
+awk 'NR>1{print$1,$2,$3,$4,$5,$6}' OFS="\t" ../borangutan_single_exon.tsv > borangutan_single_exon_scfr.bed
+bedtools intersect -a borangutan_windows.bed -b borangutan_single_exon_scfr.bed -wa -wb > window_hits.bed
+
 #🔹 Step 3: Count + and − per window
+awk '{key = $1 FS $2 FS $3
+  if ($NF == "+") plus[key]++
+  else if ($NF == "-") minus[key]++}
+END { for (k in plus) {
+    p = plus[k]
+    m = minus[k] + 0
+    if (p + m > 0)
+      print k, p, m, (p-m)/(p+m)}
+  for (k in minus) if (!(k in plus)) {
+    p = 0; m = minus[k]
+    print k, p, m, (p-m)/(p+m)}}' window_hits.bed > window_SA.tsv
+
 awk '
 {
   key = $1 FS $2 FS $3
@@ -30,8 +55,12 @@ END {
   }
 }
 ' window_hits.bed > window_asymmetry.tsv
+
 #🔹 Step 4: Extract highly asymmetric windows
-awk '$6 > 0.5 {print}' window_asymmetry.tsv > neg_strand_hotspots.bed
+#awk '$6 > 0.5 {print}' window_asymmetry.tsv > neg_strand_hotspots.bed
+awk '$6>=0.6 && ($4+$5)>=10' window_SA.tsv > pos_hotspots.bed
+awk '$6<=-0.6 && ($4+$5)>=10' window_SA.tsv > neg_hotspots.bed
+
 
 #######################
 
