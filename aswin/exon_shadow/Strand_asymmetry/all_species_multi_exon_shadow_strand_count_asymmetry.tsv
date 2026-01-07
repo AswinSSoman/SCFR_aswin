@@ -1,7 +1,7 @@
-human1075	+	848	-	1	strand	227	0.118045
-bonobo1147	+	833	-	1	strand	314	0.158586
-chimpanzee1112	+	822	-	1	strand	290	0.149948
-gorilla1165	+	866	-	1	strand	299	0.147218
-borangutan1103	+	325	-	1	strand	778	0.544818
-sorangutan1051	+	394	-	1	strand	657	0.454671
-gibbon1115	+	930	-	1	strand	185	0.0904645
+human	1075	+	848	-	227	0.118045
+bonobo	1147	+	833	-	314	0.158586
+chimpanzee	1112	+	822	-	290	0.149948
+gorilla	1165	+	866	-	299	0.147218
+borangutan	1103	+	325	-	778	0.544818
+sorangutan	1051	+	394	-	657	0.454671
+gibbon	1115	+	930	-	185	0.0904645
