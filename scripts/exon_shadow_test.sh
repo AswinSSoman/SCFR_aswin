@@ -1,4 +1,53 @@
 
+#QC exon shadow: gtf to bed step
+
+
+cd /media/aswin/SCFR/SCFR-main
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+cd exon_shadow/"$species"
+i1=$(wc -l < "$species"_coding_exons.bed)
+i2=$(awk 'NR>1 {a+=$23} END {print a}' "$species"_single_exon.tsv)
+# i3=$(awk 'NR>1 {a+=$14} END {print a}' "$species"_composite_exon.tsv)
+i3=$(awk '{print$0,$14*$30}' "$species"_composite_exon.tsv | awk '{a+=$31} END {print a}')
+i4=$(awk '{print$0,$14*$30}' "$species"_multi_exon.tsv | awk '{a+=$31} END {print a}')
+echo $species $i1 $i2 $i3 $i4
+unset i1 i2 i3 i4
+cd /media/aswin/SCFR/SCFR-main
+done | sed '1i species coding_exon single_exon composite_exon multi_exon' |  awk '{print$0,$3+$4+$5}' | awk '{print$0,$2-$6}' | column -t
+
+awk '$3="CDS"' /media/aswin/SCFR/SCFR-main/genes/borangutan/GCF_028885625.2_NHGRI_mPonPyg2-v2.0_pri_genomic.gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/note/) print $n}' | sort | uniq -c > note_gtf
+awk '$3="CDS"' /media/aswin/SCFR/SCFR-main/genes/borangutan/GCF_028885625.2_NHGRI_mPonPyg2-v2.0_pri_genomic.gtf | grep -v "^#" | grep "TAA stop codon is completed by the addition of 3" | less -SN
+
+while read i
+do
+t=$(echo $i | awk '{print$1}')
+c=$(echo $i | awk '{print$2,$3}')
+cs=$(awk '$3=="CDS"' /media/aswin/SCFR/SCFR-main/genes/human/GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf | awk -v t="$t" '{if($0~t) print$4,$5}')
+m=$(echo "$cs" | grep "$c")
+if [[ -z $m ]]
+then
+f="multi"
+else
+f="single"
+fi
+echo $t $c $f
+unset t c cs m f
+done < <(awk '$14<2 {print$11,$8,$9}' human_multi_exon.tsv) > check_single_exons_in_multi_scfrs
+
+
+awk 'NR>1{for (i=$17; i<=$18; i++) print$10,$11,i}' borangutan_composite_exon.tsv > success_exons
+awk 'NR>1{for (i=$17; i<=$18; i++) print$10,$11,i}' borangutan_multi_exon.tsv >> success_exons
+awk 'NR>1{ print$10,$11,$14}' borangutan_single_exon.tsv >> success_exons
+awk '$7==4 {print$4,$5,$8}' test/gtf_test.bed > frame_4_exons
+
+grep -wf <(grep -v -wf <(awk '{print$1}' success_exons | sort -u) <(awk '$7==4 {print$4}' test/gtf_test.bed | sort -u)) borangutan_coding_exons.bed
+
+
+
+
+
+
 
 
 Given a 6-column TSV (chr, start, end, plus, minus, asym where asym=(plus−minus)/(plus+minus)),
