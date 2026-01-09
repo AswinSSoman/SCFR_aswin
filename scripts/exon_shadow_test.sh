@@ -1,4 +1,117 @@
 
+#QC exon shadow: gtf to bed step
+
+
+cd /media/aswin/SCFR/SCFR-main
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+cd exon_shadow/"$species"
+i1=$(wc -l < "$species"_coding_exons.bed)
+i2=$(awk 'NR>1 {a+=$23} END {print a}' "$species"_single_exon.tsv)
+# i3=$(awk 'NR>1 {a+=$14} END {print a}' "$species"_composite_exon.tsv)
+i3=$(awk '{print$0,$14*$30}' "$species"_composite_exon.tsv | awk '{a+=$31} END {print a}')
+i4=$(awk '{print$0,$14*$30}' "$species"_multi_exon.tsv | awk '{a+=$31} END {print a}')
+echo $species $i1 $i2 $i3 $i4
+unset i1 i2 i3 i4
+cd /media/aswin/SCFR/SCFR-main
+done | sed '1i species coding_exon single_exon composite_exon multi_exon' |  awk '{print$0,$3+$4+$5}' | awk '{print$0,$2-$6}' | column -t
+
+awk '$3="CDS"' /media/aswin/SCFR/SCFR-main/genes/borangutan/GCF_028885625.2_NHGRI_mPonPyg2-v2.0_pri_genomic.gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/note/) print $n}' | sort | uniq -c > note_gtf
+awk '$3="CDS"' /media/aswin/SCFR/SCFR-main/genes/borangutan/GCF_028885625.2_NHGRI_mPonPyg2-v2.0_pri_genomic.gtf | grep -v "^#" | grep "TAA stop codon is completed by the addition of 3" | less -SN
+
+while read i
+do
+t=$(echo $i | awk '{print$1}')
+c=$(echo $i | awk '{print$2,$3}')
+cs=$(awk '$3=="CDS"' /media/aswin/SCFR/SCFR-main/genes/human/GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf | awk -v t="$t" '{if($0~t) print$4,$5}')
+m=$(echo "$cs" | grep "$c")
+if [[ -z $m ]]
+then
+f="multi"
+else
+f="single"
+fi
+echo $t $c $f
+unset t c cs m f
+done < <(awk '$14<2 {print$11,$8,$9}' human_multi_exon.tsv) > check_single_exons_in_multi_scfrs
+
+
+awk 'NR>1{for (i=$17; i<=$18; i++) print$10,$11,i}' borangutan_composite_exon.tsv > success_exons
+awk 'NR>1{for (i=$17; i<=$18; i++) print$10,$11,i}' borangutan_multi_exon.tsv >> success_exons
+awk 'NR>1{ print$10,$11,$14}' borangutan_single_exon.tsv >> success_exons
+awk '$7==4 {print$4,$5,$8}' test/gtf_test.bed > frame_4_exons
+
+grep -wf <(grep -v -wf <(awk '{print$1}' success_exons | sort -u) <(awk '$7==4 {print$4}' test/gtf_test.bed | sort -u)) borangutan_coding_exons.bed
+
+
+
+
+
+
+
+
+Given a 6-column TSV (chr, start, end, plus, minus, asym where asym=(plus−minus)/(plus+minus)),
+write R code that:
+- filters total>0
+- identify regions with strong/moderate plus/minus strand bias & color in plot
+- plots asymmetry vs genomic position with ggplot2, faceted by chromosome
+e.g. input: NC_085930.1 53800000 53900000 8 0 -1
+Return only R code.
+
+If I have bed file, can I find local regions of high strand asymmetry within chromosome. Count Strand asymmetry (SA) is calculated by equation = (counts in +ve - counts in -ve strand)/(counts in +ve strand - counts in -ve strand).
+SA value close to -1 means -ve strand bias & close to +1 means +ve strand bias. A higher asymmetry is observed in +ve strand of borangutan, but I want to to narrow down to the exact regions contributing to this asymmetry.
+e.g. 
+species  count  strand  count  strand  count_difference  asymmetry
+borangutan  113486  +  51260  -  1  62226  0.377709
+
+e.g.: input bed file to identify local regions of asymmetry
+NC_085930.1	121463	121853	3	1	+
+NC_072373.2	100110165	100110309	-1	1	-
+
+#🔹 Step 1: Make fixed genomic windows
+#bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan.windows.bed
+bedtools makewindows -g /media/aswin/SCFR/SCFR-main/genome_sizes/borangutan.genome -w 100000 > borangutan_windows.bed
+
+#🔹 Step 2: Intersect BED with windows
+awk 'NR>1{print$1,$2,$3,$4,$5,$6}' OFS="\t" ../borangutan_single_exon.tsv > borangutan_single_exon_scfr.bed
+bedtools intersect -a borangutan_windows.bed -b borangutan_single_exon_scfr.bed -wa -wb > window_hits.bed
+
+#🔹 Step 3: Count + and − per window
+awk '{key = $1 FS $2 FS $3
+  if ($NF == "+") plus[key]++
+  else if ($NF == "-") minus[key]++}
+END { for (k in plus) {
+    p = plus[k]
+    m = minus[k] + 0
+    if (p + m > 0)
+      print k, p, m, (p-m)/(p+m)}
+  for (k in minus) if (!(k in plus)) {
+    p = 0; m = minus[k]
+    print k, p, m, (p-m)/(p+m)}}' window_hits.bed > window_SA.tsv
+
+awk '
+{
+  key = $1 FS $2 FS $3
+  if ($9 == "+") plus[key]++
+  else if ($9 == "-") minus[key]++
+}
+END {
+  for (k in plus) {
+    p = plus[k] + 0
+    m = minus[k] + 0
+    if (p + m > 0)
+      print k, p, m, (m - p) / (m + p)
+  }
+}
+' window_hits.bed > window_asymmetry.tsv
+
+#🔹 Step 4: Extract highly asymmetric windows
+#awk '$6 > 0.5 {print}' window_asymmetry.tsv > neg_strand_hotspots.bed
+awk '$6>=0.6 && ($4+$5)>=10' window_SA.tsv > pos_hotspots.bed
+awk '$6<=-0.6 && ($4+$5)>=10' window_SA.tsv > neg_hotspots.bed
+
+
+#######################
 
 while read i
 do
