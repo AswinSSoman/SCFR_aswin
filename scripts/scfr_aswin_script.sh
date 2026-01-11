@@ -1219,6 +1219,10 @@ unset s1 s2 s3 s4
 cd /media/aswin/SCFR/SCFR-main
 done | sed '1i Species SCFR_type N min max mean Q1 median Q3' | sed 's/[ ]\+/\t/g' > exon_shadow/all_species_shadow_length_distribution.tsv
 
+cd /media/aswin/SCFR/SCFR-main/exon_shadow
+sed 's/sorangutan/sumatran orangutan/g' all_species_shadow_length_distribution.tsv -i
+sed 's/borangutan/bornean orangutan/g' all_species_shadow_length_distribution.tsv -i
+
 
 sed '1i Species single_N single_min single_max single_mean single_Q1 single_median single_Q3 multi_N multi_min multi_max multi_mean multi_Q1 multi_median multi_Q3 composite_N composite_min composite_max composite_mean composite_Q1 composite_median composite_Q3 all_N all_min all_max all_mean all_Q1 all_median all_Q3' | sed 's/[ ]\+/\t/g' > exon_shadow/all_species_shadow_length_distribution.tsv
 
