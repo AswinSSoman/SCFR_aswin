@@ -1205,6 +1205,27 @@ end_time=$(date +%s) && elapsed_time=$((end_time - start_time))
 echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
 
 
+#Plot shadow distriubtion
+cd /media/aswin/SCFR/SCFR-main
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+cd exon_shadow/"$species"
+s1=$(awk 'NR>1{print$21}' old_10jan_"$species"_single_exon.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species single_exon /g")
+s2=$(awk 'NR>1{print$21}' old_10jan_"$species"_multi_exon.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species multi_exon /g")
+s3=$(awk 'NR>1{print$21}' old_10jan_"$species"_composite_exon.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species composite_exon /g")
+s4=$(echo -e $s1"\n"$s2"\n"$s3 | awk '!($1="")($2="")' | awk '{for (i=1; i<=NF; i++) sum[i]+=$i} END{for (i=1; i<=NF; i++) printf "%s%s", sum[i], (i==NF ? "\n" : OFS)}' | sed "s/^/$species all /g")
+echo -e $s1"\n"$s2"\n"$s3"\n"$s4
+unset s1 s2 s3 s4
+cd /media/aswin/SCFR/SCFR-main
+done | sed '1i Species SCFR_type N min max mean Q1 median Q3' | sed 's/[ ]\+/\t/g' > exon_shadow/all_species_shadow_length_distribution.tsv
+
+cd /media/aswin/SCFR/SCFR-main/exon_shadow
+sed 's/sorangutan/sumatran orangutan/g' all_species_shadow_length_distribution.tsv -i
+sed 's/borangutan/bornean orangutan/g' all_species_shadow_length_distribution.tsv -i
+
+
+sed '1i Species single_N single_min single_max single_mean single_Q1 single_median single_Q3 multi_N multi_min multi_max multi_mean multi_Q1 multi_median multi_Q3 composite_N composite_min composite_max composite_mean composite_Q1 composite_median composite_Q3 all_N all_min all_max all_mean all_Q1 all_median all_Q3' | sed 's/[ ]\+/\t/g' > exon_shadow/all_species_shadow_length_distribution.tsv
+
 #Strand asymmetry in total SCFR, CDS & shadow
 
 mkdir /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
