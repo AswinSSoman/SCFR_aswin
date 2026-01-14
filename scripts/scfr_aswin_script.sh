@@ -1189,6 +1189,7 @@ dyneinq
 ####################################################################################################################################################################################################################################################################################################################
 #Exon shadow
 
+#Calculate exon shadow & exitron
 mkdir /media/aswin/SCFR/SCFR-main/exon_shadow
 cd /media/aswin/SCFR/SCFR-main
 start_time=$(date +%s)
@@ -1204,67 +1205,74 @@ wait
 end_time=$(date +%s) && elapsed_time=$((end_time - start_time))
 echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
 
+#QC
+
 #genes to exclude:
-cd /media/aswin/SCFR/SCFR-main/
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do
-gtf=$(readlink -f genes/"$species"/*.gtf)
-awk '$3="CDS"' $gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/note/) print $n}' | sort | uniq -c > /media/aswin/SCFR/SCFR-main/genes/"$species"_note_gtf
-#grep 'unassigned_transcript' $gtf | awk '$3="CDS"' > /media/aswin/SCFR/SCFR-main/genes/"$species"_unassigned_transcripts_gtf
-awk '$3="CDS"' $gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/unassigned_transcript/) print $0}' | sort | uniq -c > /media/aswin/SCFR/SCFR-main/genes/"$species"_unassigned_transcripts_gtf
-grep 'partial "true"' $gtf | awk '$3="CDS"' > /media/aswin/SCFR/SCFR-main/genes/"$species"_partial_annotation_gtf
-unset gtf
-done
+	cd /media/aswin/SCFR/SCFR-main/
+	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+	do
+	gtf=$(readlink -f genes/"$species"/*.gtf)
+	awk '$3="CDS"' $gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/note/) print $n}' | sort | uniq -c > /media/aswin/SCFR/SCFR-main/genes/"$species"_note_gtf
+	#grep 'unassigned_transcript' $gtf | awk '$3="CDS"' > /media/aswin/SCFR/SCFR-main/genes/"$species"_unassigned_transcripts_gtf
+	awk '$3="CDS"' $gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/unassigned_transcript/) print $0}' | sort | uniq -c > /media/aswin/SCFR/SCFR-main/genes/"$species"_unassigned_transcripts_gtf
+	grep 'partial "true"' $gtf | awk '$3="CDS"' > /media/aswin/SCFR/SCFR-main/genes/"$species"_partial_annotation_gtf
+	unset gtf
+	done
 
 #Filter shadow entries
-cd /media/aswin/SCFR/SCFR-main
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do
-echo ">"$species
-gtf=$(readlink -f genes/"$species"/*.gtf)
-#exons to exclude
-awk '$3=="CDS"' $gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F'\t|;' -v OFS='\t' '{tid = exon = "" 
-  for (i = 9; i <= NF; i++) {if ($i ~ /transcript_id/) tid = $i
-    if ($i ~ /exon_number/)  exon = $i
-    if ($i ~ /gene_id/) gid =$i}
-  if (tid != "" || exon != "" || gid != "")
-    print $1, $4, $5, tid, exon, gid, $7}' | sed 's/transcript_id //g' | sed 's/exon_number//g' | sed 's/gene_id//g' | tr -d ' "' > genes/"$species"/"$species"_exons_to_exclude.tsv
-#Since excluding individual exons is more complicated especially in multi-exon SCFRs, removing exons eventually remove whole gene, hence rather than remove entries by exons, remove by genes
-awk '{print$6}' genes/"$species"/"$species"_exons_to_exclude.tsv | sort -u > genes/"$species"/"$species"_unique_genes_to_exclude
-#Filter shadow files
-awk 'NR==FNR { exclude[$1]; next }
-  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_single_exon.tsv | awk -F "\t" '!($17=="last" && $22>0)' > exon_shadow/"$species"/"$species"_single_exon_filtered.tsv
-awk 'NR==FNR { exclude[$1]; next }
-  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_multi_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv
-awk 'NR==FNR { exclude[$1]; next }
-  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_composite_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv
-unset gtf
-done
+	cd /media/aswin/SCFR/SCFR-main
+	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+	do
+	echo ">"$species
+	gtf=$(readlink -f genes/"$species"/*.gtf)
+	#exons to exclude
+	awk '$3=="CDS"' $gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F'\t|;' -v OFS='\t' '{tid = exon = "" 
+	  for (i = 9; i <= NF; i++) {if ($i ~ /transcript_id/) tid = $i
+	    if ($i ~ /exon_number/)  exon = $i
+	    if ($i ~ /gene_id/) gid =$i}
+	  if (tid != "" || exon != "" || gid != "")
+	    print $1, $4, $5, tid, exon, gid, $7}' | sed 's/transcript_id //g' | sed 's/exon_number//g' | sed 's/gene_id//g' | tr -d ' "' > genes/"$species"/"$species"_exons_to_exclude.tsv
+	#Since excluding individual exons is more complicated especially in multi-exon SCFRs, removing exons eventually remove whole gene, hence rather than remove entries by exons, remove by genes
+	awk '{print$6}' genes/"$species"/"$species"_exons_to_exclude.tsv | sort -u > genes/"$species"/"$species"_unique_genes_to_exclude
+	#Filter shadow files
+	awk 'NR==FNR { exclude[$1]; next }
+	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_single_exon.tsv | awk -F "\t" '!($17=="last" && $22>0)' > exon_shadow/"$species"/"$species"_single_exon_filtered.tsv
+	awk 'NR==FNR { exclude[$1]; next }
+	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_multi_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv
+	awk 'NR==FNR { exclude[$1]; next }
+	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_composite_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv
+	unset gtf
+	done
 
 #Summary of how many non-zero downstream shadow values are present for every species with every exon type
-cd /media/aswin/SCFR/SCFR-main
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do 
-a=$(awk '$17=="last" && $22>0' exon_shadow/"$species"/"$species"_single_exon_filtered.tsv | wc -l)
-b=$(awk '$23=="last" && $16>0' exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv | wc -l)
-c=$(awk '$23=="last" && $16>0' exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv | wc -l)
-echo $a $b $c | sed "s/^/$species /g"
-unset a b c
-done | sed '1i species single multi composite' | column -t > exon_shadow/non_zero_last_exon_ds_shadow
+	cd /media/aswin/SCFR/SCFR-main
+	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+	do 
+	a=$(awk '$17=="last" && $22>0' exon_shadow/"$species"/"$species"_single_exon_filtered.tsv | wc -l)
+	b=$(awk '$23=="last" && $16>0' exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv | wc -l)
+	c=$(awk '$23=="last" && $16>0' exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv | wc -l)
+	echo $a $b $c | sed "s/^/$species /g"
+	unset a b c
+	done | sed '1i species single multi composite' | column -t > exon_shadow/non_zero_last_exon_ds_shadow
 
 #Summary of filtered
-cd /media/aswin/SCFR/SCFR-main
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do 
-a=$(wc -l < exon_shadow/"$species"/"$species"_single_exon.tsv)
-b=$(wc -l < exon_shadow/"$species"/"$species"_single_exon_filtered.tsv)
-c=$(wc -l < exon_shadow/"$species"/"$species"_multi_exon.tsv)
-d=$(wc -l < exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv)
-e=$(wc -l < exon_shadow/"$species"/"$species"_composite_exon.tsv)
-f=$(wc -l < exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv)
-echo $a $b $c $d $e $f | awk '{print$1, $2, $1-$2, $3, $4, $3-$4, $5, $6, $5-$6}' | sed "s/^/$species /g"
-unset a b c d e f
-done | sed '1i species single single_filtered difference multi multi_filtered difference composite composite_filtered difference' | column -t > exon_shadow/exon_shadow_filtered_summary
+	cd /media/aswin/SCFR/SCFR-main
+	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+	do 
+	a=$(wc -l < exon_shadow/"$species"/"$species"_single_exon.tsv)
+	b=$(wc -l < exon_shadow/"$species"/"$species"_single_exon_filtered.tsv)
+	c=$(wc -l < exon_shadow/"$species"/"$species"_multi_exon.tsv)
+	d=$(wc -l < exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv)
+	e=$(wc -l < exon_shadow/"$species"/"$species"_composite_exon.tsv)
+	f=$(wc -l < exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv)
+	echo $a $b $c $d $e $f | awk '{print$1, $2, $1-$2, $3, $4, $3-$4, $5, $6, $5-$6}' | sed "s/^/$species /g"
+	unset a b c d e f
+	done | sed '1i species single single_filtered difference multi multi_filtered difference composite composite_filtered difference' | column -t > exon_shadow/exon_shadow_filtered_summary
+
+#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered
+#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered
+#find . -mindepth 3 -maxdepth 3 -name "*exon.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered/'
+#find . -mindepth 3 -maxdepth 3 -name "*filtered.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered/'
 
 #Plot shadow distriubtion
 cd /media/aswin/SCFR/SCFR-main
