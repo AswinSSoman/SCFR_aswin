@@ -1,4 +1,64 @@
 
+################################
+
+
+#genes to exclude:
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+gtf=$(readlink -f genes/"$species"/*.gtf)
+awk '$3="CDS"' $gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/note/) print $n}' | sort | uniq -c > /media/aswin/SCFR/SCFR-main/genes/"$species"_note_gtf
+#grep 'unassigned_transcript' $gtf | awk '$3="CDS"' > /media/aswin/SCFR/SCFR-main/genes/"$species"_unassigned_transcripts_gtf
+awk '$3="CDS"' $gtf | grep -v "^#" | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/unassigned_transcript/) print $0}' | sort | uniq -c > /media/aswin/SCFR/SCFR-main/genes/"$species"_unassigned_transcripts_gtf
+grep 'partial "true"' $gtf | awk '$3="CDS"' > /media/aswin/SCFR/SCFR-main/genes/"$species"_partial_annotation_gtf
+unset gtf
+done
+
+/media/aswin/SCFR/SCFR-main$ readlink -f genes/*_gtf | xargs -n1 sh -c 'wc -l $0 | awk -F "/" "{print-\$1,\$NF}" ; cat $0 | egrep -i ">|substitut|insert|delet|modified|stop codon|frameshift" --color=always | nl' | less -SNR
+readlink -f genes/*_gtf | xargs -n1 bash -c 'echo $0 | awk -F "/" "{print\$NF}"; wc -l < $0 | sed "s/^/ - Total: /g"; egrep -i "frameshift" -c $0 | sed "s/^/ - Grepped: /g"; egrep -i "frameshift" $0 --color=always | nl' | less -SNR
+
+
+"protein translation is dependent on"
+
+'UGA stop codon recoded as selenocysteine"
+
+
+awk '$3=="CDS"' GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf | grep 'partial "true"' | awk '{print$1,$4,$5,$7}' OFS="\t" > human_cds_to_exclude.tsv
+
+awk '$3=="CDS"' GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F "\t|;" '{for (n=1;n<=NF;n++) if($n~/transcript_id/) print $1,$4,$5,$n,$7}' OFS="\t" | sed 's/transcript_id //g' | tr -d ' "' > human_exons_to_exclude.tsv 
+awk '$3=="CDS"' GCF_028885625.2_NHGRI_mPonPyg2-v2.0_pri_genomic.gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F "\t|;" '{for (n=1;n<=NF;n++) if($n~/transcript_id/) print $1,$4,$5,$n,$7}' OFS="\t" | sed 's/transcript_id //g' | tr -d ' "' > borangutan_exons_to_exclude.tsv 
+
+while read e
+do
+c1=$(echo $e | awk '{print$1}')
+c2=$(echo $e | awk '{print$2}')
+c3=$(echo $e | awk '{print$3}')
+c4=$(echo $e | awk '{print$4}')
+c5=$(echo $e | awk '{print$5}')
+echo ">"$e
+awk -v c1="$c1" -v c2="$c2" -v c3="$c3" -v c4="$c4" '$7==c1 && $8==c2 && $9==c3 && $11==$c4 && $12==c5' ../../exon_shadow/borangutan/borangutan_single_exon.tsv
+unset c1 c2 c3 c4 c5
+done < borangutan_exons_to_exclude.tsv | less
+
+
+time awk '$3=="CDS"' GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf | egrep 'partial "true"|insert|delet|stop codon' | awk '{print$1,$4,$5,$7}' OFS="\t" > human_exons_to_exclude.tsv
+time awk '$3=="CDS"' GCF_009914755.1_T2T-CHM13v2.0_genomic.gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F ";" '{for (n=1;n<=NF;n++) if($n~/transcript_id/) print $1,$4,$5,$n}' OFS="\t" > human_exons_to_exclude.tsv
+
+
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+gtf=$(readlink -f genes/"$species"/*.gtf)
+#identify annotations errors
+awk '$3=="CDS"' $gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F "\t|;" '{for (n=1;n<=NF;n++) if($n~/transcript_id/) print $1,$4,$5,$n,$7}' OFS="\t" | sed 's/transcript_id //g' | tr -d ' "' > genes/"$species"/"$species"_exons_to_exclude.tsv 
+#filter annotations
+awk 'NR==FNR {key = $1 FS $2 FS $3 FS $4 FS $5; keys[key] = ">" $0; next}
+  {key = $7 FS $8 FS $9 FS $11 FS $12
+    if (key in keys) {print}}' borangutan_exons_to_exclude.tsv ../../exon_shadow/borangutan/borangutan_single_exon.tsv > 
+
+
+
+
+######################
 #QC exon shadow: gtf to bed step
 
 
