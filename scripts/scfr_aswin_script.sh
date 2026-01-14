@@ -1233,13 +1233,24 @@ awk '$3=="CDS"' $gtf | egrep 'partial "true"|insert|delet|stop codon' | awk -F'\
 awk '{print$6}' genes/"$species"/"$species"_exons_to_exclude.tsv | sort -u > genes/"$species"/"$species"_unique_genes_to_exclude
 #Filter shadow files
 awk 'NR==FNR { exclude[$1]; next }
-  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_single_exon.tsv > exon_shadow/"$species"/"$species"_single_exon_filtered.tsv
+  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_single_exon.tsv | awk -F "\t" '!($17=="last" && $22>0)' > exon_shadow/"$species"/"$species"_single_exon_filtered.tsv
 awk 'NR==FNR { exclude[$1]; next }
-  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_multi_exon.tsv > exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv
+  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_multi_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv
 awk 'NR==FNR { exclude[$1]; next }
-  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_composite_exon.tsv > exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv
+  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_composite_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv
 unset gtf
 done
+
+#Summary of how many non-zero downstream shadow values are present for every species with every exon type
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do 
+a=$(awk '$17=="last" && $22>0' exon_shadow/"$species"/"$species"_single_exon_filtered.tsv | wc -l)
+b=$(awk '$23=="last" && $16>0' exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv | wc -l)
+c=$(awk '$23=="last" && $16>0' exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv | wc -l)
+echo $a $b $c | sed "s/^/$species /g"
+unset a b c
+done | sed '1i species single multi composite' | column -t > exon_shadow/non_zero_last_exon_ds_shadow
 
 #Summary of filtered
 cd /media/aswin/SCFR/SCFR-main
