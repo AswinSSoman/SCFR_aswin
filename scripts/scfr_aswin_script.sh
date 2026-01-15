@@ -1281,8 +1281,10 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered
+#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined
 #find . -mindepth 3 -maxdepth 3 -name "*exon.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered/'
 #find . -mindepth 3 -maxdepth 3 -name "*filtered.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered/'
+find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*_filtered_combined.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined/'
 
 #Plot shadow distriubtion
 	cd /media/aswin/SCFR/SCFR-main
@@ -1318,7 +1320,6 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	sed 's/borangutan/bornean orangutan/g' all_species_downstream_shadow_length_distribution.tsv -i
 	Rscript /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/plot_shadow_distribution.R all_species_upstream_shadow_length_distribution.tsv all_species_upstream_shadow_length_distribution.pdf
 	Rscript /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/plot_shadow_distribution.R all_species_downstream_shadow_length_distribution.tsv all_species_downstream_shadow_length_distribution.pdf
-
 
 #Strand asymmetry in total SCFR, CDS & shadow
 
