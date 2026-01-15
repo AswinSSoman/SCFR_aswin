@@ -1269,6 +1269,16 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	unset a b c d e f
 	done | sed '1i species single single_filtered difference multi multi_filtered difference composite composite_filtered difference' | column -t > exon_shadow/exon_shadow_filtered_summary
 
+#Combine all shadows (single, multi & composite)
+	cd /media/aswin/SCFR/SCFR-main
+	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+	do
+	head -1 exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv > exon_shadow/"$species"/"$species"_filtered_combined.tsv
+	awk '{print$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,1,$21,$22,$14,$14,$15,$16,$16,$17,$17,$18,$18,$19,$19,$20,$20,$23}' exon_shadow/"$species"/"$species"_single_exon_filtered.tsv | grep -v "upstream_len_in_scfr" >> exon_shadow/"$species"/"$species"_filtered_combined.tsv
+	grep -v "upstream_len_in_scfr" exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv >> exon_shadow/"$species"/"$species"_filtered_combined.tsv
+	grep -v "upstream_len_in_scfr" exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv >> exon_shadow/"$species"/"$species"_filtered_combined.tsv
+	done
+
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered
 #find . -mindepth 3 -maxdepth 3 -name "*exon.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered/'
