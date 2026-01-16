@@ -1349,6 +1349,28 @@ time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
 cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"
 
+#Composition of exon-shadow
+
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do 
+genome=$(readlink -f /media/aswin/SCFR/SCFR-main/genomes/"$species"/GC*.fna)
+echo ">"$species ":" $genome
+cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"
+mkdir composition
+cd composition
+#Get bed coordinates for upstream & downstream shadow
+awk 'NR>1{if($6=="+") print$1,$2,$8,"upstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6; else print$1,$9,$3,"upstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6}' OFS="\t" ../"$species"_filtered_combined_non_zero.tsv > upstream_"$species"_filtered_combined_non_zero.bed
+awk 'NR>1{if($6=="+") print$1,$9,$3,"downstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6; else print$1,$2,$8,"downstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6}' OFS="\t" ../"$species"_filtered_combined_non_zero.tsv > downstream_"$species"_filtered_combined_non_zero.bed
+#Extract fasta sequence
+bedtools getfasta -fi $genome -bed upstream_"$species"_filtered_combined_non_zero.bed -s -name+ > upstream_"$species"_filtered_combined_non_zero.fa
+bedtools getfasta -fi $genome -bed downstream_"$species"_filtered_combined_non_zero.bed -s -name+ > downstream_"$species"_filtered_combined_non_zero.fa
+#Get Percentage GC content
+infoseq -sequence upstream_"$species"_filtered_combined_non_zero.fa -auto -only -name -length -pgc > upstream_"$species"_filtered_combined_non_zero_pgc.out
+infoseq -sequence downstream_"$species"_filtered_combined_non_zero.fa -auto -only -name -length -pgc > downstream_"$species"_filtered_combined_non_zero_pgc.out
+unset genome
+cd /media/aswin/SCFR/SCFR-main
+done
 
 
 
