@@ -1241,9 +1241,8 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_multi_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv
 	awk 'NR==FNR { exclude[$1]; next }
 	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_composite_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv
-awk 'NR==FNR { exclude[$1]; next }
-	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_exitron_candidates.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_exitron_candidates.tsv
-
+	awk 'NR==FNR { exclude[$1]; next }
+	  !($12 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_exitron_candidates.tsv > exon_shadow/"$species"/"$species"_exitron_candidates_filtered.tsv
 	unset gtf
 	done
 
