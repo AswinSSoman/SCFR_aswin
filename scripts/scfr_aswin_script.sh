@@ -1147,7 +1147,7 @@ cd gene_deserts/SCFR_overlap_gene_deserts/"$species"/SCFR_fasta
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py "$species"_5000_overlapping_scfrs_canonical_orf_unique.fa -t 32 -o output_"$species"_5000_overlapping_scfrs_canonical_orf_unique.fa
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py "$species"_5000_overlapping_scfrs_non_canonical_orf_unique_filtered.fa -t 32 -o output_"$species"_5000_overlapping_scfrs_non_canonical_orf_unique_filtered.fa
 #Get chromosomr-wise summary
-python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py output_"$species"_5000_overlapping_scfrs_canonical_orf_unique.fa --top 3 --cores 32
+_composite_exon_filteredpython3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py output_"$species"_5000_overlapping_scfrs_canonical_orf_unique.fa --top 3 --cores 32
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py output_"$species"_5000_overlapping_scfrs_non_canonical_orf_unique_filtered.fa --top 3 --cores 32
 cd /media/aswin/SCFR/SCFR-main
 done
@@ -1241,6 +1241,9 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_multi_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv
 	awk 'NR==FNR { exclude[$1]; next }
 	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_composite_exon.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv
+awk 'NR==FNR { exclude[$1]; next }
+	  !($10 in exclude)' genes/"$species"/"$species"_unique_genes_to_exclude exon_shadow/"$species"/"$species"_exitron_candidates.tsv | awk -F "\t" '!($23=="last" && $16>0)' > exon_shadow/"$species"/"$species"_exitron_candidates.tsv
+
 	unset gtf
 	done
 
@@ -1287,18 +1290,17 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero
 #find . -mindepth 3 -maxdepth 3 -name "*exon.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered/'
 #find . -mindepth 3 -maxdepth 3 -name "*filtered.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered/'
-find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*_filtered_combined.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined/'
-find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero/'
-
+#find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*_filtered_combined.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined/'
+#find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero/'
 
 #Plot shadow distriubtion
 	cd /media/aswin/SCFR/SCFR-main
 	for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 	do
 	cd exon_shadow/"$species"
-	s1=$(awk 'NR>1{print$21}' "$species"_single_exon_filtered.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species single_exon /g")
-	s2=$(awk 'NR>1{print$15}' "$species"_multi_exon_filtered.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species multi_exon /g")
-	s3=$(awk 'NR>1{print$15}' "$species"_composite_exon_filtered.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species composite_exon /g")
+	s1=$(awk 'NR>1{print$21}' "$species"_filtered_combined_non_zero.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species single_exon /g")
+	s2=$(awk 'NR>1{print$15}' "$species"_filtered_combined_non_zero.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species multi_exon /g")
+	s3=$(awk 'NR>1{print$15}' "$species"_filtered_combined_non_zero.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species composite_exon /g")
 	s4=$(echo -e $s1"\n"$s2"\n"$s3 | awk '!($1="")($2="")' | awk '{for (i=1; i<=NF; i++) sum[i]+=$i} END{for (i=1; i<=NF; i++) printf "%s%s", sum[i], (i==NF ? "\n" : OFS)}' | sed "s/^/$species all /g")
 	echo -e $s1"\n"$s2"\n"$s3"\n"$s4
 	unset s1 s2 s3 s4
@@ -1309,9 +1311,9 @@ find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv
 	for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 	do
 	cd exon_shadow/"$species"
-	s1=$(awk 'NR>1{print$22}' "$species"_single_exon_filtered.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species single_exon /g")
-	s2=$(awk 'NR>1{print$16}' "$species"_multi_exon_filtered.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species multi_exon /g")
-	s3=$(awk 'NR>1{print$16}' "$species"_composite_exon_filtered.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species composite_exon /g")
+	s1=$(awk 'NR>1{print$22}' "$species"_filtered_combined_non_zero.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species single_exon /g")
+	s2=$(awk 'NR>1{print$16}' "$species"_filtered_combined_non_zero.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species multi_exon /g")
+	s3=$(awk 'NR>1{print$16}' "$species"_filtered_combined_non_zero.tsv | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species composite_exon /g")
 	s4=$(echo -e $s1"\n"$s2"\n"$s3 | awk '!($1="")($2="")' | awk '{for (i=1; i<=NF; i++) sum[i]+=$i} END{for (i=1; i<=NF; i++) printf "%s%s", sum[i], (i==NF ? "\n" : OFS)}' | sed "s/^/$species all /g")
 	echo -e $s1"\n"$s2"\n"$s3"\n"$s4
 	unset s1 s2 s3 s4
@@ -1327,26 +1329,27 @@ find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv
 	Rscript /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/plot_shadow_distribution.R all_species_downstream_shadow_length_distribution.tsv all_species_downstream_shadow_length_distribution.pdf
 
 #Strand asymmetry in total SCFR, CDS & shadow
-
-mkdir /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
-cd /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
-rm all_species_cds_strand_count_asymmetry.tsv  all_species_composite_exon_shadow_strand_count_asymmetry.tsv all_species_multi_exon_shadow_strand_count_asymmetry.tsv all_species_scfr_strand_count_asymmetry.tsv all_species_single_exon_shadow_strand_count_asymmetry.tsv all_species_shadow_strand_count_asymmetry.tsv
-
-cd /media/aswin/SCFR/SCFR-main/exon_shadow/
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do
-awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_coding_exons.bed | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' | sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_cds_strand_count_asymmetry.tsv
-awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_scfr_all.bed | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_scfr_strand_count_asymmetry.tsv
-awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_single_exon.tsv | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_single_exon_shadow_strand_count_asymmetry.tsv
-awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_multi_exon.tsv | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_multi_exon_shadow_strand_count_asymmetry.tsv
-awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_composite_exon.tsv | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_composite_exon_shadow_strand_count_asymmetry.tsv
-cat "$species"/"$species"_single_exon.tsv "$species"/"$species"_multi_exon.tsv "$species"/"$species"_composite_exon.tsv | awk '{c[$6]++} END {for (k in c) print c[k], k}' | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_shadow_strand_count_asymmetry.tsv
-done
+	mkdir /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
+	cd /media/aswin/SCFR/SCFR-main/exon_shadow/strand_asymmetry
+	rm all_species_cds_strand_count_asymmetry.tsv  all_species_composite_exon_shadow_strand_count_asymmetry.tsv all_species_multi_exon_shadow_strand_count_asymmetry.tsv all_species_scfr_strand_count_asymmetry.tsv all_species_single_exon_shadow_strand_count_asymmetry.tsv all_species_shadow_strand_count_asymmetry.tsv
+	
+	cd /media/aswin/SCFR/SCFR-main/exon_shadow/
+	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+	do
+	awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_coding_exons.bed | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' | sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_cds_strand_count_asymmetry.tsv
+	awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_scfr_all.bed | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_scfr_strand_count_asymmetry.tsv
+	awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_single_exon.tsv | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_single_exon_shadow_strand_count_asymmetry.tsv
+	awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_multi_exon.tsv | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_multi_exon_shadow_strand_count_asymmetry.tsv
+	awk '{c[$6]++} END {for (k in c) print c[k], k}' "$species"/"$species"_composite_exon.tsv | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_composite_exon_shadow_strand_count_asymmetry.tsv
+	cat "$species"/"$species"_single_exon.tsv "$species"/"$species"_multi_exon.tsv "$species"/"$species"_composite_exon.tsv | awk '{c[$6]++} END {for (k in c) print c[k], k}' | head -2 | paste -s -d " " | awk '{print$0,$1-$3,($1-$3)/($1+$3)}' |  sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> strand_asymmetry/all_species_shadow_strand_count_asymmetry.tsv
+	done
 
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
 cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"
+
+
 
 
 
