@@ -1296,6 +1296,9 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 
 
 #Plot shadow distriubtion
+cd /media/aswin/SCFR/SCFR-main/exon_shadow
+cat <(sed '1d' all_species_upstream_shadow_length_distribution.tsv | awk '{$2="up" OFS $2}1') <(sed '1d' all_species_downstream_shadow_length_distribution.tsv | awk '{$2="down" OFS $2}1') | sed '1i Species direction N min max mean Q1 median Q3' | sed 's/[ \t]\+/\t/g' > all_species_total_shadow_length_distribution.tsv
+
 	cd /media/aswin/SCFR/SCFR-main
 	for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 	do
