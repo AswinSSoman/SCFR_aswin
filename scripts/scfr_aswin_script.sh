@@ -1280,17 +1280,20 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 	grep -v "upstream_len_in_scfr" exon_shadow/"$species"/"$species"_multi_exon_filtered.tsv >> exon_shadow/"$species"/"$species"_filtered_combined.tsv
 	grep -v "upstream_len_in_scfr" exon_shadow/"$species"/"$species"_composite_exon_filtered.tsv >> exon_shadow/"$species"/"$species"_filtered_combined.tsv
 	sed 's/[\t ]\+/\t/g' exon_shadow/"$species"/"$species"_filtered_combined.tsv -i
-	awk '$15>0 && $16>0' exon_shadow/"$species"/"$species"_filtered_combined.tsv > exon_shadow/"$species"/"$species"_filtered_combined_non_zero.tsv
+	awk '$15>0 || $16>0' exon_shadow/"$species"/"$species"_filtered_combined.tsv > exon_shadow/"$species"/"$species"_filtered_combined_non_zero.tsv
 	done
 
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined
 #mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero
+#mkdir -p /media/aswin/SCFR/SCFR-main/shreya/exitron_filtered
 #find . -mindepth 3 -maxdepth 3 -name "*exon.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/unfiltered/'
 #find . -mindepth 3 -maxdepth 3 -name "*filtered.tsv" -type f | egrep -v "old" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered/'
 #find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*_filtered_combined.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined/'
 #find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero/'
+
+
 
 #Plot shadow distriubtion
 	cd /media/aswin/SCFR/SCFR-main
