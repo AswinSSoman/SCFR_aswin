@@ -1,0 +1,8 @@
+"Enrichment FDR","nGenes","Pathway Genes","Fold Enrichment","Pathway","URL","Genes"
+0.00534007221001823,6,136,9.1955013664074,"Path:pps00190 Oxidative phosphorylation","https://www.genome.jp/kegg-bin/show_pathway?pps00190"," ND6  ND4  ND5  ND3  ATP6  ND4L"
+0.0111137339042547,7,217,5.47981316439386,"Path:pps05208 Chemical carcinogenesis-reactive oxygen species","https://www.genome.jp/kegg-bin/show_pathway?pps05208"," SOS2  ND6  ND4  ND5  ND3  ATP6  ND4L"
+0.0132199707594348,7,223,5.07796019900498,"Path:pps04714 Thermogenesis","https://www.genome.jp/kegg-bin/show_pathway?pps04714"," SOS2  ND6  ND4  ND5  ND3  ATP6  ND4L"
+0.0277400805623833,6,199,4.73101881894873,"Path:pps05415 Diabetic cardiomyopathy","https://www.genome.jp/kegg-bin/show_pathway?pps05415"," ND6  ND4  ND5  ND3  ATP6  ND4L"
+0.0241726658425823,7,259,4.27917994298172,"Path:pps05012 Parkinson disease","https://www.genome.jp/kegg-bin/show_pathway?pps05012"," XBP1  ND6  ND4  ND5  ND3  ATP6  ND4L"
+0.00785511033923635,10,354,4.20129084308189,"Path:pps05014 Amyotrophic lateral sclerosis","https://www.genome.jp/kegg-bin/show_pathway?pps05014"," XBP1  HNRNPA1L2  GPX5  GPX1  ND6  ND4  ND5  ND3  ATP6  ND4L"
+0.0166868153157527,8,292,4.12562778524439,"Path:pps05016 Huntington disease","https://www.genome.jp/kegg-bin/show_pathway?pps05016"," GPX5  GPX1  ND6  ND4  ND5  ND3  ATP6  ND4L"
