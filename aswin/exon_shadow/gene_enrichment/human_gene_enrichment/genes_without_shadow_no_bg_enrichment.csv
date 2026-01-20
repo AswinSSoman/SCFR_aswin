@@ -1,0 +1,5 @@
+"Enrichment FDR","nGenes","Pathway Genes","Fold Enrichment","Pathway","URL","Genes"
+5.92872500733399e-21,26,448,13.6342893217893,"Path:hsa04740 Olfactory transduction","https://www.genome.jp/kegg-bin/show_pathway?hsa04740"," OR4X2  OR5P3  OR8I2  OR4L1  OR9A4  OR9A2  OR2F2  OR4C11  OR8K5  OR8U3  OR10D3  OR4E2  OR2J2  OR4C12  OR13C9  OR5F1  OR8S1  OR51Q1  OR52E8  OR4X1  OR4D10  OR2L8  OR2G6  OR4A5  OR4A16  OR1E1"
+8.22091492356054e-05,5,58,20.2525252525253,"Path:hsa00480 Glutathione metabolism","https://www.genome.jp/kegg-bin/show_pathway?hsa00480"," GPX6  GPX1  GPX2  GPX3  GPX4"
+0.00055208489147277,3,17,41.458110516934,"Path:hsa00450 Selenocompound metabolism","https://www.genome.jp/kegg-bin/show_pathway?hsa00450"," TXNRD3  SEPHS2  TXNRD1"
+0.00240389942098017,4,74,12.6988806988807,"Path:hsa04918 Thyroid hormone synthesis","https://www.genome.jp/kegg-bin/show_pathway?hsa04918"," GPX6  GPX1  GPX2  GPX3"
