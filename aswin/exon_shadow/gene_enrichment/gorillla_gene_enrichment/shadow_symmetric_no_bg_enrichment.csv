@@ -1,0 +1,3 @@
+"Enrichment FDR","nGenes","Pathway Genes","Fold Enrichment","Pathway","URL","Genes"
+0.035823443159677,17,59,2.58197719005706,"Path:ggo04510 Focal adhesion","https://www.genome.jp/kegg-bin/show_pathway?ggo04510"," COL4A1  COL6A3  PIK3R1  BCAR1  LAMA3  FN1  MYLK3  LAMA1  TNC  ITGB7  RASGRF1  ITGA6  MYL2  COL4A2  TNN  MYL11  SHC4"
+0.035823443159677,21,83,2.26723581749164,"Path:ggo04820 Cytoskeleton in muscle cells","https://www.genome.jp/kegg-bin/show_pathway?ggo04820"," DSG2  AMPD2  COL4A1  COL6A3  ANKRD23  SPTBN1  MYH4  MYH8  FN1  COL27A1  LAMA1  NID1  DIAPH3  ITGB7  ITGA6  MYL2  ACTN2  COL4A2  DSC2  FMNL3  MYL11"
