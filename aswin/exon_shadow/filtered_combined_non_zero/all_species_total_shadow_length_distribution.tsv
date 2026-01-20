@@ -1,0 +1,15 @@
+Species	direction	N	min	max	mean	Q1	median	Q3
+human	up	237978	-2	11803	78.9	22	48	101
+bonobo	up	221275	-2	56106	77.4	21	47	99
+chimpanzee	up	226767	-2	40539	77.9	21	48	99
+gorilla	up	220706	-2	34926	78.7	21	47	99
+borangutan	up	219837	-2	37221	76.5	21	47	98
+sorangutan	up	219743	-2	41169	76.2	21	47	97
+gibbon	up	223831	-2	22740	78.7	21	47	99
+human	down	237978	-2	20066	62.3	1	30	83
+bonobo	down	221275	-2	37620	62.7	1	30	84
+chimpanzee	down	226767	-2	26105	62.7	1	30	84
+gorilla	down	220706	-2	24777	63.7	1	31	84
+borangutan	down	219837	-2	33098	62.6	1	31	84
+sorangutan	down	219743	-2	30983	62.5	1	30	83
+gibbon	down	223831	-2	16774	64.1	1	30	84
