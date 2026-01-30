@@ -1294,7 +1294,6 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 #find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero/'
 
 
-
 #Plot shadow distriubtion
 cd /media/aswin/SCFR/SCFR-main/exon_shadow
 cat <(sed '1d' all_species_upstream_shadow_length_distribution.tsv | awk '{$2="up" OFS $2}1') <(sed '1d' all_species_downstream_shadow_length_distribution.tsv | awk '{$2="down" OFS $2}1') | sed '1i Species direction N min max mean Q1 median Q3' | sed 's/[ \t]\+/\t/g' > all_species_total_shadow_length_distribution.tsv
@@ -1354,8 +1353,23 @@ time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
 cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"
 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Composition of exon-shadow
 
+#rename chromosomes
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do 
+gr=$(ls /media/aswin/SCFR/SCFR-main/genome_reports/GC*.tsv | grep "$species")
+genome=$(readlink -f /media/aswin/SCFR/SCFR-main/genomes/"$species"/GC*.fna)
+cd /media/aswin/SCFR/SCFR-main/genomes/$species
+awk -F "\t" -v OFS="\t" '{ for(N=1; N<=NF; N++) if($N=="") $N="-" } 1' $gr | sed 's/[ ]\+/_/g' | awk 'NR>1{print$6,$9}' | tr " " "\t" > map.tsv
+gawk -i inplace 'BEGIN{while ((getline < "map.tsv") > 0)
+    map[$1] = $2}
+/^>/{for(k in map) if(index($0, k)) sub(/^>/, ">" map[k] " ")} {print}' $genome
+unset gr genome
+done
+
+#Extract fasta of exon shadow:
 cd /media/aswin/SCFR/SCFR-main
 time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do 
@@ -1364,20 +1378,18 @@ echo ">"$species ":" $genome
 cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"
 mkdir composition
 cd composition
-#Get bed coordinates for upstream & downstream shadow
-awk 'NR>1{if($6=="+") print$1,$2,$8,"upstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6; else print$1,$9,$3,"upstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6}' OFS="\t" ../"$species"_filtered_combined_non_zero.tsv > upstream_"$species"_filtered_combined_non_zero.bed
-awk 'NR>1{if($6=="+") print$1,$9,$3,"downstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6; else print$1,$2,$8,"downstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6}' OFS="\t" ../"$species"_filtered_combined_non_zero.tsv > downstream_"$species"_filtered_combined_non_zero.bed
+#Get bed coordinates for upstream & downstream shadow (head = upstream, gene, transcript ID, first exon number, last exon number, first exon start, last exon start, frame)
+awk '$15>0' ../"$species"_filtered_combined_non_zero.tsv | awk 'NR>1{if($6=="+") print$1,$2,$8,"upstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6; else print$1,$9,$3,"upstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6}' OFS="\t" > upstream_"$species"_filtered_combined_non_zero.bed
+awk '$16>0' ../"$species"_filtered_combined_non_zero.tsv | awk 'NR>1{if($6=="+") print$1,$9,$3,"downstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6; else print$1,$2,$8,"downstream_"$10"_"$11"_"$17"_"$18"_"$8"_"$9"_"$4,1,$6}' OFS="\t" > downstream_"$species"_filtered_combined_non_zero.bed
 #Extract fasta sequence
 bedtools getfasta -fi $genome -bed upstream_"$species"_filtered_combined_non_zero.bed -s -name+ > upstream_"$species"_filtered_combined_non_zero.fa
 bedtools getfasta -fi $genome -bed downstream_"$species"_filtered_combined_non_zero.bed -s -name+ > downstream_"$species"_filtered_combined_non_zero.fa
 #Get Percentage GC content
-infoseq -sequence upstream_"$species"_filtered_combined_non_zero.fa -auto -only -name -length -pgc > upstream_"$species"_filtered_combined_non_zero_pgc.out
-infoseq -sequence downstream_"$species"_filtered_combined_non_zero.fa -auto -only -name -length -pgc > downstream_"$species"_filtered_combined_non_zero_pgc.out
+#infoseq -sequence upstream_"$species"_filtered_combined_non_zero.fa -auto -only -name -length -pgc > upstream_"$species"_filtered_combined_non_zero_pgc.out
+#infoseq -sequence downstream_"$species"_filtered_combined_non_zero.fa -auto -only -name -length -pgc > downstream_"$species"_filtered_combined_non_zero_pgc.out
 unset genome
 cd /media/aswin/SCFR/SCFR-main
 done
-
-
 
 
 #Find SCFR exon overlaps (113.083 mins)
