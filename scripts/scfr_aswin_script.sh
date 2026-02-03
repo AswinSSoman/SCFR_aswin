@@ -1386,6 +1386,39 @@ unset genome
 cd /media/aswin/SCFR/SCFR-main
 done
 
+#Get intron sequences (12m53.760s)
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"
+genome=$(readlink -f /media/aswin/SCFR/SCFR-main/genomes/"$species"/GC*.fna)
+#Extract intron fasta
+time /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/extract_introns.sh "$species"_coding_exons.bed $genome "$species"_introns.fa
+#filter duplicate introns
+time seqkit rmdup -s < "$species"_introns.fa > "$species"_introns_filtered.fa
+unset genome
+cd /media/aswin/SCFR/SCFR-main/
+done 
+
+#Calculate GC 
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"/composition
+up=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/upstream_"$species"_filtered_combined_non_zero.fa)
+dn=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/downstream_"$species"_filtered_combined_non_zero.fa)
+in=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/"$species"_introns_filtered.fa)
+ex=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GC*_cds.fa)
+#calculate GC & AT content & average G/C stretch
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $up > "$species"_upstream_gc_at.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $dn > "$species"_downstream_gc_at.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $in > "$species"_intron_gc_at.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $ex > "$species"_exon_gc_at.out
+unset up dn in ex
+cd /media/aswin/SCFR/SCFR-main
+done
 
 #plot SCFR positional exon shadow (1m47.891s)
 	cd /media/aswin/SCFR/SCFR-main
