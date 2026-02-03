@@ -1421,6 +1421,43 @@ unset up dn in ex
 cd /media/aswin/SCFR/SCFR-main
 done
 
+#Calculate & plot distribution
+
+mkdir -p /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch
+
+#Create output files
+echo -e "species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3" > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/gc_distribution.tsv
+echo -e "species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3" > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/at_distribution.tsv
+echo -e "species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3" > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/avg_gc_stretch_distribution.tsv
+
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"/composition
+#GC
+for seq in $(find . -name "*_gc_at_avg_gc_stretch.out")
+do
+id=$(echo $seq | cut -f2 -d "/" | cut -f2 -d "_")
+awk 'NR>1{print$2}' $seq | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species $id /g"
+done | sed 's/[ ]\+/\t/g' >> /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/gc_distribution.tsv
+#AT
+for seq in $(find . -name "*_gc_at_avg_gc_stretch.out")
+do
+id=$(echo $seq | cut -f2 -d "/" | cut -f2 -d "_")
+awk 'NR>1{print$3}' $seq | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species $id /g"
+done | sed 's/[ ]\+/\t/g' >> /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/at_distribution.tsv
+#Average GC atrect
+for seq in $(find . -name "*_gc_at_avg_gc_stretch.out")
+do
+id=$(echo $seq | cut -f2 -d "/" | cut -f2 -d "_")
+awk 'NR>1{print$4}' $seq | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species $id /g"
+done | sed 's/[ ]\+/\t/g' >> /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/avg_gc_stretch_distribution.tsv
+cd /media/aswin/SCFR/SCFR-main
+unset seq id
+done
+
+
 #plot SCFR positional exon shadow (1m47.891s)
 	cd /media/aswin/SCFR/SCFR-main
 	time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
