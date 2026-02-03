@@ -1457,22 +1457,30 @@ cd /media/aswin/SCFR/SCFR-main
 unset seq id
 done
 
+####################################################################################################################################################################################################################################################################################################
+#Exitron 
 
-#P
-echo "chr start end frame filler frame chr exon_1_start exon_1_end exon_2_start exon_2_end gene transcript exon_strand exon_frame intron_start intron_end intron_length merged_txs first_exon_number last_exon_number gene_tx_count first_exon_tx_count last_exon_tx_count first_exon_order last_exon_order first_exon_sharing last_exon_sharing first_exon_splicing last_exon_splicing" | sed 's/[ \t]\+/\t/g' > gibbon_exitron_candidates_filtered_exon_features.tsv
-
+#Add exon related data to exitron results
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"
+echo "chr start end frame filler frame chr exon_1_start exon_1_end exon_2_start exon_2_end gene transcript exon_strand exon_frame intron_start intron_end intron_length merged_txs first_exon_number last_exon_number gene_tx_count first_exon_tx_count last_exon_tx_count first_exon_order last_exon_order first_exon_sharing last_exon_sharing first_exon_splicing last_exon_splicing" > "$species"_exitron_candidates_filtered_exon_features.tsv
 time while read ee
 do
 e1=$(echo $ee | awk '{print$7,$8,$9,$12,$13,$14,$15}' OFS="\t")
 e2=$(echo $ee | awk '{print$7,$10,$11,$12,$13,$14,$15}' OFS="\t")
-em1=$(grep "$e1" gibbon_coding_exons.bed | awk '{print$8,$9,$10,$11,$12,$13}')
-em2=$(grep "$e1" gibbon_coding_exons.bed | awk '{print$8,$10,$11,$12,$13}')
-echo $em1 $em2 | awk '{print$1,$7,$2,$3,$8,$4,$9,$5,$10,$6,$11,$12}'
-echo $ee $em1 $em2
-unset e1 e2 em1 em2
-done < <(sed '1d' gibbon_exitron_candidates_filtered.tsv) >> gibbon_exitron_candidates_filtered_exon_features.tsv
-
-sed 's/[ \t]\+/\t/g' gibbon_exitron_candidates_filtered_exon_features.tsv -i
+em1=$(grep "$e1" "$species"_coding_exons.bed | awk '{print$8,$9,$10,$11,$12,$13}')
+em2=$(grep "$e2" "$species"_coding_exons.bed | awk '{print$8,$10,$11,$12,$13}')
+em=$(echo $em1 $em2 | awk '{print$1,$7,$2,$3,$8,$4,$9,$5,$10,$6,$11,$12}')
+echo $ee $em
+unset e1 e2 em1 em2 em
+done < <(sed '1d' "$species"_exitron_candidates_filtered.tsv) >> "$species"_exitron_candidates_filtered_exon_features.tsv
+sed 's/[ \t]\+/\t/g' "$species"_exitron_candidates_filtered_exon_features.tsv -i
+unset ee
+cd /media/aswin/SCFR/SCFR-main
+done
 
 
 
