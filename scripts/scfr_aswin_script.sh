@@ -1411,11 +1411,12 @@ up=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/
 dn=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/downstream_"$species"_filtered_combined_non_zero.fa)
 in=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/"$species"_introns_filtered.fa)
 ex=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GC*_cds.fa)
+seqkit rmdup -s < $ex | sed -E 's/^>lcl\|([^[:space:]]+).*/>\1/' > "$species"_exon.fa
 #calculate GC & AT content & average G/C stretch
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $up > "$species"_upstream_gc_at.out
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $dn > "$species"_downstream_gc_at.out
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $in > "$species"_intron_gc_at.out
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $ex > "$species"_exon_gc_at.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $up > "$species"_upstream_gc_at_avg_gc_stretch.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $dn > "$species"_downstream_gc_at_avg_gc_stretch.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $in > "$species"_intron_gc_at_avg_gc_stretch.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh "$species"_exon.fa > "$species"_exon_gc_at_avg_gc_stretch.out
 unset up dn in ex
 cd /media/aswin/SCFR/SCFR-main
 done
