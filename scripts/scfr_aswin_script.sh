@@ -1451,12 +1451,14 @@ dn=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/
 in=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/"$species"_introns_filtered.fa)
 ex=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GC*_cds.fa)
 seqkit rmdup -s < $ex | sed -E 's/^>lcl\|([^[:space:]]+).*/>\1/' > "$species"_exon.fa
+xt=$(readlink -f "$species"_exitron_candidates_filtered_exon_features.fa)
 #calculate GC, AT content, GC skew, average G/C stretch, average A/T stretch
 /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $up > "$species"_upstream_composition.out
 /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $dn > "$species"_downstream_composition.out
 /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $in > "$species"_intron_composition.out
 /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh "$species"_exon.fa > "$species"_exon_composition.out
-unset up dn in ex
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $xt > "$species"_exitron_composition.out
+unset up dn in ex xt
 cd /media/aswin/SCFR/SCFR-main
 done
 
@@ -1464,7 +1466,6 @@ done
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Calculate & plot distribution
 
-#!/usr/bin/env bash
 set -euo pipefail
 
 BASE=/media/aswin/SCFR/SCFR-main
