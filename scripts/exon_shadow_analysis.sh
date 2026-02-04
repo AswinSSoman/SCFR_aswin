@@ -363,4 +363,26 @@ awk 'NR>1{print$12}' "$species"_exitron_candidates_filtered_exon_features.tsv | 
 cd /media/aswin/SCFR/SCFR-main
 done
 
+#################################################################################################################################################################################################################################################################################################
+#Fourier analysis
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"/composition
+echo "- Running: Upstream"
+seqtk seq -L 30 upstream_"$species"_filtered_combined_non_zero.fa > upstream_"$species"_filtered_combined_non_zero_filtered.fa
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py upstream_"$species"_filtered_combined_non_zero_filtered.fa -t 32 -o upstream_fourier
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py exitron_fourier --top 3 --cores 32
+echo "- Running: Downstream"
+seqtk seq -L 30 downstream_"$species"_filtered_combined_non_zero.fa > downstream_"$species"_filtered_combined_non_zero_filtered.fa
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py downstream_"$species"_filtered_combined_non_zero_filtered.fa -t 32 -o downstream_fourier
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py exitron_fourier --top 3 --cores 32
+echo "- Running: Extron"
+seqtk seq -L 30 "$species"_exitron_candidates_filtered_exon_features.fa > "$species"_exitron_candidates_filtered_exon_features_filtered.fa
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py "$species"_exitron_candidates_filtered_exon_features_filtered.fa -t 32 -o exitron_fourier
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py exitron_fourier --top 3 --cores 32
+cd /media/aswin/SCFR/SCFR-main/
+done
 
