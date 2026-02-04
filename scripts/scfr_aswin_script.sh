@@ -1205,6 +1205,7 @@ wait
 end_time=$(date +%s) && elapsed_time=$((end_time - start_time))
 echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
 
+#################################################################################################################################################################################################################################################################################################
 #QC
 
 #genes to exclude:
@@ -1293,6 +1294,7 @@ echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/6
 #find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*_filtered_combined.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined/'
 #find exon_shadow/ -maxdepth 2 -mindepth 2 -name "*filtered_combined_non_zero.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow/filtered_combined_non_zero/'
 
+#################################################################################################################################################################################################################################################################################################
 #Plot shadow distriubtion
 
 cd /media/aswin/SCFR/SCFR-main
@@ -1326,7 +1328,7 @@ Rscript /media/aswin/SCFR/SCFR-main/scripts/plot_all_species_exon_shadow_distrib
 mkdir /media/aswin/SCFR/SCFR-main/exon_shadow/asymmetry
 cd /media/aswin/SCFR/SCFR-main/exon_shadow/asymmetry
 #rm all_species_cds_strand_count_asymmetry.tsv all_species_composite_exon_shadow_strand_count_asymmetry.tsv all_species_multi_exon_shadow_strand_count_asymmetry.tsv all_species_scfr_strand_count_asymmetry.tsv all_species_single_exon_shadow_strand_count_asymmetry.tsv all_species_shadow_strand_count_asymmetry.tsv
-	
+
 cd /media/aswin/SCFR/SCFR-main/exon_shadow/
 time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
@@ -1348,10 +1350,10 @@ awk '$15>0 {c15++} $16>0 {c16++} END {print"up", c15; print"down", c16}' "$speci
 awk '{a+=$15; b+=$16} END{print a,b}' "$species"/"$species"_filtered_combined_non_zero.tsv | awk '{print$1,"up",$2,"down",$1-$2,($1-$2)/($1+$2)}' | sed "s/^/$species /g" | sed 's/[ ]\+/\t/g' >> asymmetry/all_species_direction_total_shadow_length_asymmetry.tsv
 done
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#################################################################################################################################################################################################################################################################################################
 #Composition of exon-shadow
 
-#rename chromosomes
+#rename chromosomes fro extracting shadow fasta
 time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do 
 gr=$(ls /media/aswin/SCFR/SCFR-main/genome_reports/GC*.tsv | grep "$species")
@@ -1401,66 +1403,8 @@ unset genome
 cd /media/aswin/SCFR/SCFR-main/
 done 
 
-#Calculate GC 
-cd /media/aswin/SCFR/SCFR-main
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do
-echo ">"$species
-cd exon_shadow/"$species"/composition
-up=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/upstream_"$species"_filtered_combined_non_zero.fa)
-dn=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/downstream_"$species"_filtered_combined_non_zero.fa)
-in=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/"$species"_introns_filtered.fa)
-ex=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GC*_cds.fa)
-seqkit rmdup -s < $ex | sed -E 's/^>lcl\|([^[:space:]]+).*/>\1/' > "$species"_exon.fa
-#calculate GC & AT content & average G/C stretch
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $up > "$species"_upstream_gc_at_avg_gc_stretch.out
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $dn > "$species"_downstream_gc_at_avg_gc_stretch.out
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh $in > "$species"_intron_gc_at_avg_gc_stretch.out
-/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/fasta_GC_AT_GC_stretch.sh "$species"_exon.fa > "$species"_exon_gc_at_avg_gc_stretch.out
-unset up dn in ex
-cd /media/aswin/SCFR/SCFR-main
-done
-
-#Calculate & plot distribution
-
-mkdir -p /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch
-
-#Create output files
-echo -e "species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3" > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/gc_distribution.tsv
-echo -e "species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3" > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/at_distribution.tsv
-echo -e "species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3" > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/avg_gc_stretch_distribution.tsv
-
-cd /media/aswin/SCFR/SCFR-main
-time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
-do
-echo ">"$species
-cd exon_shadow/"$species"/composition
-#GC
-for seq in $(find . -name "*_gc_at_avg_gc_stretch.out")
-do
-id=$(echo $seq | cut -f2 -d "/" | cut -f2 -d "_")
-awk 'NR>1{print$2}' $seq | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species $id /g"
-done | sed 's/[ ]\+/\t/g' >> /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/gc_distribution.tsv
-#AT
-for seq in $(find . -name "*_gc_at_avg_gc_stretch.out")
-do
-id=$(echo $seq | cut -f2 -d "/" | cut -f2 -d "_")
-awk 'NR>1{print$3}' $seq | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species $id /g"
-done | sed 's/[ ]\+/\t/g' >> /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/at_distribution.tsv
-#Average GC atrect
-for seq in $(find . -name "*_gc_at_avg_gc_stretch.out")
-do
-id=$(echo $seq | cut -f2 -d "/" | cut -f2 -d "_")
-awk 'NR>1{print$4}' $seq | python3 /media/aswin/SCFR/SCFR-main/my_scripts/get_stats.py | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" | awk -F ":" '{print$NF}' | tr -d " ," | paste -s -d " " | sed "s/^/$species $id /g"
-done | sed 's/[ ]\+/\t/g' >> /media/aswin/SCFR/SCFR-main/exon_shadow/plot/composition/gc_at_gc_stretch/avg_gc_stretch_distribution.tsv
-cd /media/aswin/SCFR/SCFR-main
-unset seq id
-done
-
-####################################################################################################################################################################################################################################################################################################
-#Exitron 
-
-#Add exon related data to exitron results
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Add exon related data to exitron results (40m48.259s)
 cd /media/aswin/SCFR/SCFR-main
 time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
@@ -1482,6 +1426,114 @@ unset ee
 cd /media/aswin/SCFR/SCFR-main
 done
 
+#Get exitron fasta
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"
+awk 'NR>1{print$7,$16,$17,$12"_"$13"_"$20"_"$21,1,$14}' OFS="\t" "$species"_exitron_candidates_filtered_exon_features.tsv > composition/"$species"_exitron_candidates_filtered_exon_features.bed
+bedtools getfasta -fi /media/aswin/SCFR/SCFR-main/genomes/"$species"/GC*.fna -bed composition/"$species"_exitron_candidates_filtered_exon_features.bed -name+ -s > composition/"$species"_exitron_candidates_filtered_exon_features.fa
+cd /media/aswin/SCFR/SCFR-main
+done
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Calculate composittion:
+
+#26m6.043s
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"/composition
+up=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/upstream_"$species"_filtered_combined_non_zero.fa)
+dn=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/downstream_"$species"_filtered_combined_non_zero.fa)
+in=$(readlink -f /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/"$species"_introns_filtered.fa)
+ex=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GC*_cds.fa)
+seqkit rmdup -s < $ex | sed -E 's/^>lcl\|([^[:space:]]+).*/>\1/' > "$species"_exon.fa
+xt=$(readlink -f "$species"_exitron_candidates_filtered_exon_features.fa)
+#calculate GC, AT content, GC skew, average G/C stretch, average A/T stretch
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $up > "$species"_upstream_composition.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $dn > "$species"_downstream_composition.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $in > "$species"_intron_composition.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh "$species"_exon.fa > "$species"_exon_composition.out
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh $xt > "$species"_exitron_composition.out
+unset up dn in ex xt
+cd /media/aswin/SCFR/SCFR-main
+done
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Calculate & plot distribution
+
+set -euo pipefail
+
+BASE=/media/aswin/SCFR/SCFR-main
+OUTDIR=$BASE/exon_shadow/plot/composition
+STATS_PY=$BASE/my_scripts/get_stats.py
+
+species_list=(human bonobo chimpanzee gorilla borangutan sorangutan gibbon)
+
+# -----------------------------------
+# Create output files (unchanged)
+# -----------------------------------
+mkdir -p "$OUTDIR"
+header="species\tseq_type\tN\tmin\tmax\tmean\tq1\tmedian\tq3"
+echo -e "$header" > "$OUTDIR/gc_distribution.tsv"
+echo -e "$header" > "$OUTDIR/at_distribution.tsv"
+echo -e "$header" > "$OUTDIR/gc_skew_distribution.tsv"
+echo -e "$header" > "$OUTDIR/gc3_distribution.tsv"
+echo -e "$header" > "$OUTDIR/avg_gc_stretch_distribution.tsv"
+echo -e "$header" > "$OUTDIR/avg_at_stretch_distribution.tsv"
+cd "$BASE"
+
+time for species in "${species_list[@]}"; do
+    echo ">$species"
+    COMP_DIR=$BASE/exon_shadow/$species/composition
+    cd "$COMP_DIR"
+    # Cache file list once per species
+    mapfile -t files < <(find . -name "*_composition.out")
+    # column → output file mapping
+    declare -A cols=(
+        [2]=gc_distribution.tsv
+        [3]=at_distribution.tsv
+        [4]=gc_skew_distribution.tsv
+        [5]=gc3_distribution.tsv
+        [6]=avg_gc_stretch_distribution.tsv
+        [7]=avg_at_stretch_distribution.tsv
+    )
+    for col in "${!cols[@]}"; do
+        for seq in "${files[@]}"; do
+            id=$(basename "$seq" | cut -f2 -d "_")
+            awk -v c="$col" 'NR>1{print $c}' "$seq" \
+            | python3 "$STATS_PY" \
+            | egrep "Count|^Minimum|^Maximum|^Mean|^Median|^Q1|^Q3" \
+            | awk -F ":" '{print $NF}' \
+            | tr -d " ," \
+            | paste -s -d " " \
+            | sed "s/^/$species $id /"
+        done \
+        | sed 's/[ ]\+/\t/g' \
+        >> "$OUTDIR/${cols[$col]}"
+    done
+    cd "$BASE"
+done
+
+
+#################################################################################################################################################################################################################################################################################################
+#Gene set Enrichment
+
+#Get genes with exitrons
+cd /media/aswin/SCFR/SCFR-main
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd exon_shadow/"$species"
+awk 'NR>1{print$12}' "$species"_exitron_candidates_filtered_exon_features.tsv | sort | uniq > "$species"_genes_with_exitron_candidates.txt
+cd /media/aswin/SCFR/SCFR-main
+done
+
+
 
 
 
@@ -1496,8 +1548,6 @@ done
 	python3 /media/aswin/SCFR/SCFR-main/my_scripts/Figure_3/positional_exon_shadow_in_scfr.py -i "$species"_results.multi_exon.txt -t "$species"_positional_multiple_exon_shadow_in_scfr.csv -p "$species"_positional_multiple_exon_shadow_in_scfr.pdf -b 20
 	cd /media/aswin/SCFR/SCFR-main
 	done
-
-
 
 awk '{if($4~"-") print$1,$10,$11,$5"_exitron","1","-"; else print$1,$10,$11,$5"_exitron","1","+"}' OFS="\t" "$species"_results.exitron_candidates.txt | grep -v "#chrom" > "$species"_results.exitron_candidates.bed
 time while read e
