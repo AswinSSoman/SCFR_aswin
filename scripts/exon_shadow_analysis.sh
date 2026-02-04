@@ -340,6 +340,16 @@ time for species in "${species_list[@]}"; do
     cd "$BASE"
 done
 
+#Plot distribution
+for i in $(ls *distribution.tsv)
+do
+p=$(echo $i | sed 's/_distribution.tsv//g' | sed 's/gc/GC/g' | sed 's/at/AT/g' | sed 's/AT\b/& content/g' | sed 's/GC\b/& content/g' | sed 's/avg/Average /g' | tr "_" " ")
+o=$(echo $i | sed 's/\.tsv$/\.pdf/g')
+echo $p $o
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/plot_composition_distribution.R $i $o "$p distribution" "$p"
+unset p o
+done
+
 #################################################################################################################################################################################################################################################################################################
 #Gene set Enrichment
 
