@@ -1,3 +1,4 @@
+species	seq_type	N	min	max	mean	q1	median	q3
 human	intron	217292	0	24.8	3.7	3.5	3.6	3.8
 human	downstream	205741	0	39.4	2.3	0	3	4
 human	exon	89905	0	8.4	3.9	3.6	3.9	4.2
