@@ -137,6 +137,79 @@ cd /media/aswin/SCFR/SCFR-main
 Rscript /media/aswin/SCFR/SCFR-main/Aishwarya_dwivedi/all_species_overall_data.R exon_shadow/all_species_total_shadow_length_distribution.tsv exon_shadow/all_species_total_shadow_length_distribution.pdf
 Rscript /media/aswin/SCFR/SCFR-main/scripts/plot_all_species_exon_shadow_distribution.R exon_shadow/all_species_positive_shadow_length_distribution.tsv exon_shadow/all_species_positive_shadow_length_distribution.pdf
 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Plot proportions
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+cd exon_shadow/"$species"
+i1=$(awk 'NR > 1 {c4[$4]; c5[$5]; count++} END {print length(c4),length(c5), count}' "$species"_coding_exons.bed)
+i2=$(awk 'NR > 1 {u10[$10]; u11[$11]; sum14 += $14} END {print length(u10),length(u11),sum14}' "$species"_filtered_combined_non_zero.tsv)
+echo $species $i1 $i2 | awk '{print$0,($5/$2)*100, ($6/$3)*100, ($7/$4)*100}' | awk '{print$0,100-$8,100-$9,100-$10}'
+unset i1 i2
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species total_genes total_tx total_exons shadow_genes shadow_tx shadow_exons pc_genes_with_shadow pc_txs_with_shadow pc_exons_with_shadow pc_genes_wo_shadow pc_txs_wo_shadow pc_exons_wo_shadow' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/shadow_proportion_in_genes.tsv
+
+cp /media/aswin/SCFR/SCFR-main/SCFR_all/all_scfr_length_stats.tsv exon_shadow/plot/
+sed 's/Sumatran orangutan/sorangutan/g' exon_shadow/plot/all_scfr_length_stats.tsv -i
+sed 's/Bornean orangutan/borangutan/g' exon_shadow/plot/all_scfr_length_stats.tsv -i
+sed 's/./\L&/' exon_shadow/plot/all_scfr_length_stats.tsv -i
+
+#Don't plot
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+i1=$(grep -i $species /media/aswin/SCFR/SCFR-main/exon_shadow/plot/all_scfr_length_stats.tsv | awk '{print$2}')
+i2=$(awk 'END {print NR-1}' exon_shadow/"$species"/"$species"_filtered_combined_non_zero.tsv)
+i3=$(awk 'END {print NR-1}' exon_shadow/"$species"/"$species"_exitron_candidates_filtered.tsv)
+echo $species $i1 $i2 $i3 | awk '{print$0,($3/$2)*100, ($4/$2)*100}' | awk '{print$0,100-$5,100-$6}'
+unset i1 i2 i3
+done | sed '1i Species total_scfr shadoe_scfr exitron_scfr pc_scfr_with_shadow pc_scfr_with_exitron pc_scfr_wo_shadow pc_scfr_wo_exitron' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/shadow_proportion_in_scfrs.tsv
+
+#Exitron proportion in genes & transcripts
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd exon_shadow/"$species"
+i1=$(awk 'NR > 1 {c4[$4]; c5[$5]} END {print length(c4),length(c5)}' "$species"_coding_exons.bed)
+i2=$(awk 'NR > 1 {u12[$12]; u13[$13]} END {print length(u12), length(u13)}' "$species"_exitron_candidates_filtered.tsv)
+echo $species $i1 $i2 | awk '{pg=($4/$2)*100; pt=($5/$3)*100; print $0, pg, pt, 100-pg, 100-pt}'
+unset i1 i2
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species total_genes total_tx genes_with_exitron tx_with_exitron pc_genes_with_exitron pc_txs_with_exitron pc_genes_wo_exitron pc_txs_wo_exitron' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/exitron_percentage_in_genes_txs.tsv
+
+#Proportion of shadow types
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd exon_shadow/"$species"
+t=$(awk 'END {print (NR-1)*2}' "$species"_filtered_combined_non_zero.tsv)
+s=$(awk 'NR > 1 {
+    if ($15 > 0) pos++; else if ($15 < 0) neg++; else zero++;
+    if ($16 > 0) pos++; else if ($16 < 0) neg++; else zero++;} 
+END {print pos+0, neg+0, zero+0}' "$species"_filtered_combined_non_zero.tsv)
+d=$(awk 'NR > 1 { if ($15 > 0) p15++; if ($16 > 0) p16++ } END { print p15+0, p16+0 }' "$species"_filtered_combined_non_zero.tsv)
+echo $t $s $d | awk '{print$0,($2/$1)*100, ($3/$1)*100, ($4/$1)*100, ($5/($5+$6))*100, ($6/($5+$6))*100}' | sed "s/^/$species /g"
+unset t s d
+cd /media/aswin/SCFR/SCFR-main
+done | sed '1i Species total_shadows positive_shadows negative_shadows zero_shadows up_shadows down_shadows pc_positive_shadows pc_negative_shadows pc_zero_shadows pc_up_shadows pc_down_shadows' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/shadow_types.tsv
+
+#Shadoe pair
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd exon_shadow/"$species"
+i1=$(awk 'END{print NR-1}' "$species"_filtered_combined_non_zero.tsv)
+i2=$(awk 'END{print NR-1}' "$species"_exitron_candidates_filtered.tsv)
+i3=$(awk 'NR > 1 && $16 <= 0 && $15 > 0 {count++} END {print count+0}' "$species"_filtered_combined_non_zero.tsv)
+i4=$(awk 'NR > 1 && $15 <= 0 && $16 > 0 {count++} END {print count+0}' "$species"_filtered_combined_non_zero.tsv)
+i5=$(awk 'NR > 1 && $15 > 0 && $16 > 0 {count++} END {print count+0}' "$species"_filtered_combined_non_zero.tsv)
+echo $i1 $i2 $i3 $i4 $i5 | awk '{print$0,($2/$1)*100,($3/$1)*100,($4/$1)*100,($5/$1)*100}' | awk '{print$1,$2,$3,$4,$5,$6,100-$6,$7,$8,$9}' | sed "s/^/$species /g"
+unset i1 i2 i3 i4 i5
+cd /media/aswin/SCFR/SCFR-main
+done | sed '1i Species total_shadows exitron_shadows only_up_shadows only_down_shadows both_shadow pc_shadow_with_exitron pc_shadow_without_exitron pc_only_up pc_only_down pc_both_shadow' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/paired_shadow_proportions.tsv
+
 #################################################################################################################################################################################################################################################################################################
 #Strand asymmetry in total SCFR, CDS & shadow
 
