@@ -459,10 +459,32 @@ python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summ
 cd /media/aswin/SCFR/SCFR-main/
 done
 
-
-for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+#Get fourier peaks
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
-max=$(awk 'NR==2{max=$14} NR>2 && $14>max{max=$14} END{print max}' exon_shadow/"$species"/"$species"_filtered_combined_non_zero.tsv)
-echo $species $max
-unset max
-done
+echo ">"$species
+cd exon_shadow/"$species"/composition/exitron_fourier
+awk '$3>0' chromosome_wise_summary/summary.tsv > exitrons_with_peaks.tsv
+awk '$3 > 0 && $4 ~ /^0\.3/' chromosome_wise_summary/summary.tsv > 3_periodicity_exitrons.tsv
+cd /media/aswin/SCFR/SCFR-main/
+done 
+
+
+#Print summary of exitron results
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd exon_shadow/"$species"/composition
+i1=$(grep ">" "$species"_exitron_candidates_filtered_exon_features_filtered.fa -c)
+i2=$(awk 'END{print NR-1}' exitron_fourier/chromosome_wise_summary/summary.tsv)
+i3=$(awk 'END{print NR-1}' exitron_fourier/exitrons_with_peaks.tsv)
+i4=$(wc -l < exitron_fourier/3_periodicity_exitrons.tsv)
+echo $species $i1 $i2 $i3 $i4
+unset i1 i2 i3 i4
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species total_filtered_exitrons exitrons_in_ouput exitron_with_peak exitrons_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/exitron/exitron_summary.tsv
+
+
+
+##
