@@ -459,3 +459,10 @@ python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summ
 cd /media/aswin/SCFR/SCFR-main/
 done
 
+
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+max=$(awk 'NR==2{max=$14} NR>2 && $14>max{max=$14} END{print max}' exon_shadow/"$species"/"$species"_filtered_combined_non_zero.tsv)
+echo $species $max
+unset max
+done
