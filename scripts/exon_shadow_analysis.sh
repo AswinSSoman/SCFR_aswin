@@ -267,6 +267,7 @@ cd /media/aswin/SCFR/SCFR-main
 mkdir -p /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length
 find exon_shadow/ -mindepth 3 -maxdepth 3 -name "*top_enriched_shadow_lengths.pdf" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length/'
 find exon_shadow/ -mindepth 3 -maxdepth 3 -name "*top_enriched_shadow_length_bins.pdf" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length/'
+find exon_shadow/ -mindepth 3 -maxdepth 3 -name "enrichment_*_shadow_length_1_500.pdf" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length/'
 
 #################################################################################################################################################################################################################################################################################################
 #Composition of exon-shadow
