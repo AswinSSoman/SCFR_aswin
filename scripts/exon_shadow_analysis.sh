@@ -248,6 +248,25 @@ done
 
 #Plot Strand asymmetry
 
+#################################################################################################################################################################################################################################################################################################
+#Shadow length enrichment
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+echo ">"$species
+rm -r exon_shadow/"$species"/enrichment_shadow_length
+mkdir exon_shadow/"$species"/enrichment_shadow_length
+cd exon_shadow/"$species"/enrichment_shadow_length
+#plot
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/enrichment_shadow_length.R ../"$species"_filtered_combined_non_zero.tsv enrichment_"$species"
+cd /media/aswin/SCFR/SCFR-main/
+done
+
+cd /media/aswin/SCFR/SCFR-main
+mkdir -p /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length
+find exon_shadow/ -mindepth 3 -maxdepth 3 -name "*top_enriched_shadow_lengths.pdf" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length/'
+find exon_shadow/ -mindepth 3 -maxdepth 3 -name "*top_enriched_shadow_length_bins.pdf" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/exon_shadow/plot/enrichment_shadow_length/'
 
 #################################################################################################################################################################################################################################################################################################
 #Composition of exon-shadow
@@ -470,7 +489,6 @@ awk '$3 > 0 && $4 ~ /^0\.3/' chromosome_wise_summary/summary.tsv > 3_periodicity
 cd /media/aswin/SCFR/SCFR-main/
 done 
 
-
 #Print summary of exitron results
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
@@ -484,7 +502,5 @@ echo $species $i1 $i2 $i3 $i4
 unset i1 i2 i3 i4
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species total_filtered_exitrons exitrons_in_ouput exitron_with_peak exitrons_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/exitron/exitron_summary.tsv
-
-
 
 ##
