@@ -156,7 +156,7 @@ sed 's/Sumatran orangutan/sorangutan/g' exon_shadow/plot/all_scfr_length_stats.t
 sed 's/Bornean orangutan/borangutan/g' exon_shadow/plot/all_scfr_length_stats.tsv -i
 sed 's/./\L&/' exon_shadow/plot/all_scfr_length_stats.tsv -i
 
-#Don't plot
+#Percent of SCFR with & without shadow: Don't plot since the percent os 99% and 1%
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
 do
@@ -195,7 +195,7 @@ unset t s d
 cd /media/aswin/SCFR/SCFR-main
 done | sed '1i Species total_shadows positive_shadows negative_shadows zero_shadows up_shadows down_shadows pc_positive_shadows pc_negative_shadows pc_zero_shadows pc_up_shadows pc_down_shadows' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/shadow_types.tsv
 
-#Shadoe pair
+#Shadow pair
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
