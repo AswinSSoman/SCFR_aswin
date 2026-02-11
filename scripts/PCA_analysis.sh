@@ -156,6 +156,21 @@ time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
     process_species_threshold "$species"
 done
 
+#Check run
+cd /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans
+for i in $(ls -d */ | tr -d "/")
+do
+for f in gt1000 gt2500 gt5000 gt7500 gt10000
+do
+pdf=$(find $i/$f -mindepth 1 -maxdepth 1 -name "pca_cluster_PC1_PC2.pdf" -type f)
+if [[ -z $pdf ]]; then p="not-run"; else p="run"; fi
+ns=$(grep ">" -c $i/$f/$i"_"$f".fasta")
+ts=$(grep -v ">" $i/$f/$i"_"$f".fasta" | wc | awk '{print$3-$1}')
+echo $i $f $p $ns $ts
+unset pdf p ns ts
+done
+unset f
+done | column -t
 
 #######################################################################################################################################################################################################################################################################################################
 
