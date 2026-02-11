@@ -467,11 +467,11 @@ cd exon_shadow/"$species"/composition
 echo "- Running: Upstream"
 seqtk seq -L 30 upstream_"$species"_filtered_combined_non_zero.fa > upstream_"$species"_filtered_combined_non_zero_filtered.fa
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py upstream_"$species"_filtered_combined_non_zero_filtered.fa -t 32 -o upstream_fourier
-python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py exitron_fourier --top 3 --cores 32
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py upstream_fourier --top 3 --cores 32
 echo "- Running: Downstream"
 seqtk seq -L 30 downstream_"$species"_filtered_combined_non_zero.fa > downstream_"$species"_filtered_combined_non_zero_filtered.fa
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py downstream_"$species"_filtered_combined_non_zero_filtered.fa -t 32 -o downstream_fourier
-python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py exitron_fourier --top 3 --cores 32
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summary.py downstream_fourier --top 3 --cores 32
 echo "- Running: Extron"
 seqtk seq -L 30 "$species"_exitron_candidates_filtered_exon_features.fa > "$species"_exitron_candidates_filtered_exon_features_filtered.fa
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/orf_parallel_fft_motif_report_grouped.py "$species"_exitron_candidates_filtered_exon_features_filtered.fa -t 32 -o exitron_fourier
@@ -479,16 +479,19 @@ python3 /media/aswin/SCFR/SCFR-main/my_scripts/scfr_fourier_chromosome_wise_summ
 cd /media/aswin/SCFR/SCFR-main/
 done
 
-#Get fourier peaks
+#Get fourier peaks (11m50.294s)
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
 echo ">"$species
-cd exon_shadow/"$species"/composition/exitron_fourier
-awk '$3>0' chromosome_wise_summary/summary.tsv > exitrons_with_peaks.tsv
-awk '$3 > 0 && $4 ~ /^0\.3/' chromosome_wise_summary/summary.tsv > 3_periodicity_exitrons.tsv
+awk '$3>0' exon_shadow/"$species"/composition/upstream_fourier/chromosome_wise_summary/summary.tsv > exon_shadow/"$species"/composition/upstream_fourier/upstream_with_peaks.tsv
+awk '$3 > 0 && $4 ~ /^0\.3/' exon_shadow/"$species"/composition/upstream_fourier/chromosome_wise_summary/summary.tsv > exon_shadow/"$species"/composition/upstream_fourier/3_periodicity_upstream.tsv
+awk '$3>0' exon_shadow/"$species"/composition/downstream_fourier/chromosome_wise_summary/summary.tsv > exon_shadow/"$species"/composition/downstream_fourier/downstream_with_peaks.tsv
+awk '$3 > 0 && $4 ~ /^0\.3/' exon_shadow/"$species"/composition/downstream_fourier/chromosome_wise_summary/summary.tsv > exon_shadow/"$species"/composition/downstream_fourier/3_periodicity_downstream.tsv
+awk '$3>0' exon_shadow/"$species"/composition/exitron_fourier/chromosome_wise_summary/summary.tsv > exon_shadow/"$species"/composition/exitron_fourier/exitron_with_peaks.tsv
+awk '$3 > 0 && $4 ~ /^0\.3/' exon_shadow/"$species"/composition/exitron_fourier/chromosome_wise_summary/summary.tsv > exon_shadow/"$species"/composition/exitron_fourier/3_periodicity_exitron.tsv
 cd /media/aswin/SCFR/SCFR-main/
-done 
+done
 
 #Print summary of exitron results
 cd /media/aswin/SCFR/SCFR-main/
@@ -502,6 +505,45 @@ i4=$(wc -l < exitron_fourier/3_periodicity_exitrons.tsv)
 echo $species $i1 $i2 $i3 $i4
 unset i1 i2 i3 i4
 cd /media/aswin/SCFR/SCFR-main/
-done | sed '1i Species total_filtered_exitrons exitrons_in_ouput exitron_with_peak exitrons_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/exitron/exitron_summary.tsv
+done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/exitron_summary.tsv
+
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd exon_shadow/"$species"/composition
+i1=$(grep ">" upstream_"$species"_filtered_combined_non_zero_filtered.fa -c)
+i2=$(awk 'END{print NR-1}' upstream_fourier/chromosome_wise_summary/summary.tsv)
+i3=$(awk 'END{print NR-1}' upstream_fourier/upstream_with_peaks.tsv)
+i4=$(wc -l < upstream_fourier/3_periodicity_upstream.tsv)
+echo $species $i1 $i2 $i3 $i4
+unset i1 i2 i3 i4
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/upstream_summary.tsv
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd exon_shadow/"$species"/composition
+i1=$(grep ">" downstream_"$species"_filtered_combined_non_zero_filtered.fa -c)
+i2=$(awk 'END{print NR-1}' downstream_fourier/chromosome_wise_summary/summary.tsv)
+i3=$(awk 'END{print NR-1}' downstream_fourier/downstream_with_peaks.tsv)
+i4=$(wc -l < downstream_fourier/3_periodicity_downstream.tsv)
+echo $species $i1 $i2 $i3 $i4
+unset i1 i2 i3 i4
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/downstream_summary.tsv
 
 ##
+#find . -mindepth 4 -maxdepth 4 -name "exitron_with_peaks.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/exitron/'
+#cp plot/exitron_summary.tsv /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/exitron/
+#find . -mindepth 4 -maxdepth 4 -name "upstream_with_peaks.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/upstream'
+#cp plot/upstream_summary.tsv /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/upstream/
+#find . -mindepth 4 -maxdepth 4 -name "downstream_with_peaks.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/downstream'
+#cp plot/downstream_summary.tsv /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/downstream
+
+
+
+
+
+
