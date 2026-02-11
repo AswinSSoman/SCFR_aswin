@@ -177,5 +177,21 @@ done | column -t
 /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed
 bedtools intersect -a /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed -b 1000_2500.bed -wo > test
 
+
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+for f in 1000_2500 2500_5000 5000_7500 7500_10000 gt10000
+do
+cd Length_bin_PCA_kmeans/"$species"/"$f"
+bedtools intersect -a ../"$f".bed -b /media/aswin/SCFR/SCFR-main/exon_shadow/$species/"$species"_coding_exons.bed -wo \
+ | awk '$6$7==$17' | awk '{print$0,$3-$2,$16-$15,($20/($16-$15))*100}' | awk '{print$17"::"$14":"$15"-"$16"("$19")","in_frame_coding",$20,$21,$22,$23}' | awk 'NR==1; NR>1 {print $0}' | sort -k1,1 -k6,6rn | awk '!seen[$1]++' | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g' > scfr_coding_"$f".tsv
+bedtools intersect -a ../"$f".bed -b /media/aswin/SCFR/SCFR-main/exon_shadow/$species/"$species"_coding_exons.bed -wo \
+ | awk '$6$7!=$17' | awk '{print$0,$3-$2,$16-$15,($20/($16-$15))*100}' | awk '{print$17"::"$14":"$15"-"$16"("$19")","out_frame_coding",$20,$21,$22,$23}' | awk 'NR==1; NR>1 {print $0}' test | sort -k1,1 -k6,6rn | awk '!seen[$1]++' | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g' > scfr_non_coding_"$f".tsv
+
+
+
+
 find . -maxdepth 3 -mindepth 3  -name "*.fasta" -type f | xargs -n1 bash -c 'paste <(echo $0 | cut -f4 -d "/") <(grep -v ">" $0 | wc | awk "{print\$3-\$1}")' > total_fasta_length
 
