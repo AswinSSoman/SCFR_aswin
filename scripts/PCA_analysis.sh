@@ -6,7 +6,7 @@
 #######################################################################################################################################################################################################################################################################################################
 #Length bin:
 
-#Run PCA & k-mean clustering for different length bins & see if clustering gets better with SCFR length bins
+#Run PCA & k-mean clustering for different length bins & see if clustering gets better with SCFR length bins (189m8.519s)
 process_species() {
   species="$1"
 
@@ -74,6 +74,22 @@ time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
     process_species "$species"
 done
 
+#Check run
+cd /media/aswin/SCFR/SCFR-main/Length_bin_PCA_kmeans
+for i in $(ls -d */ | tr -d "/")
+do
+for f in 1000_2500 2500_5000 5000_7500 7500_10000 gt10000
+do
+pdf=$(find $i/$f -mindepth 1 -maxdepth 1 -name "pca_cluster_PC1_PC2.pdf" -type f)
+if [[ -z $pdf ]]; then p="not-run"; else p="run"; fi
+ns=$(grep ">" -c $i/$f/$i"_"$f".fasta")
+ts=$(grep -v ">" $i/$f/$i"_"$f".fasta" | wc | awk '{print$3-$1}')
+echo $i $f $p $ns $ts
+unset pdf p ns ts
+done
+unset f
+done | column -t
+
 #######################################################################################################################################################################################################################################################################################################
 #Length threshold:
 
@@ -135,8 +151,11 @@ Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R "$OUTDI
 export -f process_species_threshold
 
 #Run for 7 species
-time parallel -j 7 process_species_threshold ::: \
-  human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+#time parallel -j 7 process_species_threshold ::: human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+time for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon; do
+    process_species_threshold "$species"
+done
+
 
 #######################################################################################################################################################################################################################################################################################################
 
