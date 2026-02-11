@@ -1,0 +1,8 @@
+Species	input_count	output_count	output_with_peaks	output_with_3_periodicity
+human	156002	150838	603	182
+bonobo	143595	140898	550	192
+borangutan	142109	139451	524	186
+sorangutan	142063	139458	500	169
+chimpanzee	147432	144584	543	191
+gorilla	143201	140728	497	171
+gibbon	145311	141247	737	303
