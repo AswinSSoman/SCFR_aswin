@@ -536,10 +536,13 @@ done | sed '1i Species input_count output_count output_with_peaks output_with_3_
 
 ##
 #find . -mindepth 4 -maxdepth 4 -name "exitron_with_peaks.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/exitron/'
+#find . -mindepth 4 -maxdepth 4 -name "3_periodicity_exitrons.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/exitron/'
 #cp plot/exitron_summary.tsv /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/exitron/
 #find . -mindepth 4 -maxdepth 4 -name "upstream_with_peaks.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/upstream'
+#find . -mindepth 4 -maxdepth 4 -name "3_periodicity_upstream.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/upstream'
 #cp plot/upstream_summary.tsv /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/upstream/
 #find . -mindepth 4 -maxdepth 4 -name "downstream_with_peaks.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/downstream'
+#find . -mindepth 4 -maxdepth 4 -name "3_periodicity_downstream.tsv" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/downstream'
 #cp plot/downstream_summary.tsv /media/aswin/SCFR/SCFR-main/shreya/exon_shadow_fourier/downstream
 
 
