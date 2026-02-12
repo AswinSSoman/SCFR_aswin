@@ -173,6 +173,77 @@ unset f
 done | column -t
 
 #######################################################################################################################################################################################################################################################################################################
+#label coding vs non-coding SCFRs in PCA
+
+cd /media/aswin/SCFR/SCFR-main
+for bed in $(find Length_threshold_PCA_kmeans/ -mindepth 2 -maxdepth 2 -name "gt1000.bed" -type f | xargs readlink -f)
+do
+species=$(echo $bed | cut -f7 -d "/")
+sp=$(grep -i "$species" /media/aswin/SCFR/SCFR-main/genome_reports/species_names | awk '{print$2}' | tr "_" " ")
+path=$(echo $bed | sed 's!/gt1000.bed!!g')
+cd $path
+echo ">"$species
+#scfr overlapping exons in same frame
+bedtools intersect -a $bed -b /media/aswin/SCFR/SCFR-main/exon_shadow/$species/"$species"_coding_exons.bed -wo | awk '$12$13==$4' | awk '{$NF = $NF + 1; print}' | awk '{print$0,$9-$8+1,$3-$2+1,($20/($9-$8+1))*100}' \
+| awk '{print$4"::"$1":"$2"-"$3"("$6")","in_frame_coding",$20,$21,$22,$23}' | sort -k1,1 -k6,6rn | awk '!seen[$1]++' | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g' > scfr_inframe_coding_gt1000.tsv
+#scfr overlapping exons in diff frame
+bedtools intersect -a $bed -b /media/aswin/SCFR/SCFR-main/exon_shadow/$species/"$species"_coding_exons.bed -wo | awk '$12$13!=$4' | awk '{$NF = $NF + 1; print}' | awk '{print$0,$9-$8+1,$3-$2+1,($20/($9-$8+1))*100}' \
+| awk '{print$4"::"$1":"$2"-"$3"("$6")","out_frame_coding",$20,$21,$22,$23}' | sort -k1,1 -k6,6rn | awk '!seen[$1]++' | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g' > scfr_outframe_coding_gt1000.tsv
+#scfr_inframe_coding_gt1000.tsv & scfr_outframe_coding_gt1000.tsv have some common scfrs, remove these common ones from scfr_outframe_coding_gt1000.tsv
+awk -F'\t' 'NR==FNR {seen[$1]; next} !($1 in seen)' scfr_inframe_coding_gt1000.tsv scfr_outframe_coding_gt1000.tsv | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g'  > scfr_outframe_coding_gt1000_filtered.tsv
+#scfr not overlapping exons
+awk '{print $1}' scfr_inframe_coding_gt1000.tsv scfr_outframe_coding_gt1000_filtered.tsv > exclude_list.txt
+seqkit grep -v -f exclude_list.txt gt1000/"$species"_gt1000.fasta | grep ">" | sed 's/$/ non_coding/g' | sed '1i SCFR coding_status' | sed 's/[ ]\+/\t/g' > scfr_non_coding_gt1000.tsv
+#final list of scfrs & coding status
+awk '{print$1,$2}' scfr_inframe_coding_gt1000.tsv scfr_outframe_coding_gt1000_filtered.tsv scfr_non_coding_gt1000.tsv | grep -v "coding_status" | sed '1i SCFR coding_status' | sed 's/[ ]\+/\t/g' > scfr_coding_status.tsv
+unset species sp path 
+cd /media/aswin/SCFR/SCFR-main
+done
+
+#######################################################################################################################################################################################################################################################################################################
+#Summary
+
+#Summary of Length bin
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd Length_bin_PCA_kmeans/"$species"/
+for lenbin in 2500_5000 5000_7500 7500_10000 gt10000
+do
+cd $lenbin
+i1=$(awk '$1 == "PC1" || $1 == "PC2" {sum += $3} END {print sum}' explained_variance.tsv)
+i2=$(awk 'NR>1 && $5 != "NA" {if($5 > max) {max=$5; k=$0}} END {print k}' k_optimization_scores.tsv)
+echo $species $lenbin $i1 $i2
+unset i1 i2
+cd ../
+done
+unset lenbin
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species Length_bin PC1_PC2 k Silhouette DBI WCSS Curvature' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/Length_bin_PCA_kmeans/all_species_pca_clustering_summary.tsv
+
+#Summary of Length threshold
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd Length_threshold_PCA_kmeans/"$species"/
+for lenthr in gt2500 gt5000 gt7500 gt10000
+do
+cd $lenthr
+i1=$(awk '$1 == "PC1" || $1 == "PC2" {sum += $3} END {print sum}' explained_variance.tsv)
+i2=$(awk 'NR>1 && $5 != "NA" {if($5 > max) {max=$5; k=$0}} END {print k}' k_optimization_scores.tsv)
+echo $species $lenthr $i1 $i2
+unset i1 i2
+cd ../
+done
+unset lenthr
+cd /media/aswin/SCFR/SCFR-main/
+done | sed '1i Species Length_threshold PC1_PC2 k Silhouette DBI WCSS Curvature' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.tsv
+
+/media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans$ Rscript ../Length_bin_PCA_kmeans/plot_pca_clustering_summary.R all_species_pca_clustering_summary.tsv all_species_pca_clustering_summary.png
+
+
+
+
 
 /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed
 bedtools intersect -a /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed -b 1000_2500.bed -wo > test
