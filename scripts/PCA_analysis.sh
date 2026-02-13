@@ -201,6 +201,44 @@ cd /media/aswin/SCFR/SCFR-main
 done
 
 #######################################################################################################################################################################################################################################################################################################
+#Identify repeats in SCFRs of atleast 1000bp length
+
+#Run repeat masker (ran for 3 species (chimpanzee, gorilla, human) using species library, for rest hominidiae is used as species)
+cd /media/aswin/SCFR/SCFR-main
+time for seq in $(find Length_threshold_PCA_kmeans/ -mindepth 3 -name "*_gt1000.fasta" -type f | xargs readlink -f | egrep "gibbon|borangutan|bonobo|sorangutan")
+do
+mkdir -p repeat_masker/"$species"
+species=$(echo $seq | cut -f7 -d "/")
+sp=$(grep -i "$species" /media/aswin/SCFR/SCFR-main/genome_reports/species_names | awk '{print$2}' | tr "_" " ")
+echo ">"$species
+cd repeat_masker
+time /media/aswin/programs/RepeatMasker-4.1.7/RepeatMasker/RepeatMasker -pa 8 -a -s -u -gff -html -species "Hominidae" -dir $species -xsmall $seq
+unset species sp
+cd /media/aswin/SCFR/SCFR-main
+done
+
+#######################################################################################################################################################################################################################################################################################################
+
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd Length_bin_PCA_kmeans/"$species"/
+coding_status=$(readlink -f /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/"$species"/scfr_coding_status.tsv)
+repeat_class=$(readlink -f /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000.fasta.out)
+for lenbin in 2500_5000 5000_7500 7500_10000 gt10000
+do
+cd $lenbin
+#plot PCA by color
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . .
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . .
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_class
+done
+unset lenbin coding_status repeat_class
+cd /media/aswin/SCFR/SCFR-main/
+done
+
+#######################################################################################################################################################################################################################################################################################################
 #Summary
 
 #Summary of Length bin
