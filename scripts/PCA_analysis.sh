@@ -220,6 +220,7 @@ done
 #######################################################################################################################################################################################################################################################################################################
 #Plot PCA & color by different factors
 
+#For length bin
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
@@ -227,16 +228,45 @@ echo ">"$species
 cd Length_bin_PCA_kmeans/"$species"/
 coding_status=$(readlink -f /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/"$species"/scfr_coding_status.tsv)
 repeat_class=$(readlink -f /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000.fasta.out)
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/fastaout_to_tsv.py $repeat_class /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000_pca_input.out
+repeat_input=$(readlink -f /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000_pca_input.out)
 for lenbin in 2500_5000 5000_7500 7500_10000 gt10000
 do
+echo " -"$lenbin
 cd $lenbin
 #plot PCA by color
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . .
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . .
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_class
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_input
+cd ../
 done
-unset lenbin coding_status repeat_class
+unset lenbin coding_status repeat_class repeat_input
+cd /media/aswin/SCFR/SCFR-main/
+done
+
+#For length threshold
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+echo ">"$species
+cd Length_threshold_PCA_kmeans/"$species"/
+coding_status=$(readlink -f /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/"$species"/scfr_coding_status.tsv)
+repeat_class=$(readlink -f /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000.fasta.out)
+python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/fastaout_to_tsv.py $repeat_class /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000_pca_input.out
+repeat_input=$(readlink -f /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000_pca_input.out)
+for lenbin in gt2500 gt5000 gt7500 gt10000
+do
+echo " -"$lenbin
+cd $lenbin
+#plot PCA by color
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . .
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . .
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_input
+cd ../
+done
+unset lenbin coding_status repeat_class repeat_input
 cd /media/aswin/SCFR/SCFR-main/
 done
 
