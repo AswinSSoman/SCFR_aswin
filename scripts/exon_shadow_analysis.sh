@@ -507,7 +507,7 @@ unset i1 i2 i3 i4
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/exitron_summary.tsv
 
-
+#Print summary of upstream results
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
@@ -521,6 +521,7 @@ unset i1 i2 i3 i4
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/upstream_summary.tsv
 
+#Print summary of downstream results
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
@@ -533,6 +534,21 @@ echo $species $i1 $i2 $i3 $i4
 unset i1 i2 i3 i4
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species input_count output_count output_with_peaks output_with_3_periodicity' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/exon_shadow/plot/downstream_summary.tsv
+
+#Plot fourier frequence density
+cd /media/aswin/SCFR/SCFR-main
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd /media/aswin/SCFR/SCFR-main/exon_shadow/"$species"/composition/
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R upstream_fourier/upstream_with_peaks.tsv "$species"_upstream_fourier_fourier_freq.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R downstream_fourier/downstream_with_peaks.tsv "$species"_downstream_fourier_fourier_freq.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R exitron_fourier/exitron_with_peaks.tsv "$species"_exitron_fourier_fourier_freq.pdf
+cd /media/aswin/SCFR/SCFR-main
+done
+
+
+#################################################################################################################################################################################################################################################################################################
 
 
 #Transfer data
