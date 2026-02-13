@@ -1031,6 +1031,17 @@ echo ">"$species
 awk '$6~"0.33"' Fourier_analysis/$species/all_length_thresholds_fourier_summary > Fourier_analysis/$species/3_periodicity_scfrs
 done
 
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Plot fourier frequency dendity
+
+
+awk '$1=="without_coding_region"' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="with_coding_region"' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_without_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_with_coding_region_all_length_thresholds_fourier_summary.pdf
+
+
+
 #Look at fourier periodicity in SCFRs located inside gene deserts
 
 ####################################################################################################################################################################################################################################################################################################################
