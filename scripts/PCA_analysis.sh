@@ -290,7 +290,7 @@ cd /media/aswin/SCFR/SCFR-main/
 done
 
 #######################################################################################################################################################################################################################################################################################################
-#Summary
+#Summary of PCA at different lengths
 
 #Summary of Length bin
 cd /media/aswin/SCFR/SCFR-main/
@@ -328,10 +328,12 @@ unset lenthr
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species Length_threshold PC1_PC2 k Silhouette DBI WCSS Curvature' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.tsv
 
-/media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans$ Rscript ../Length_bin_PCA_kmeans/plot_pca_clustering_summary.R all_species_pca_clustering_summary.tsv all_species_pca_clustering_summary.png
+cd /media/aswin/SCFR/SCFR-main
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R Length_bin_PCA_kmeans/all_species_pca_clustering_summary.tsv Length_bin_PCA_kmeans/all_species_pca_clustering_summary.png
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.tsv Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.png
 
 
-
+      
 
 
 #######################################################################################################################################################################################################################################################################################################
