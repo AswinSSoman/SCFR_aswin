@@ -218,10 +218,12 @@ cd /media/aswin/SCFR/SCFR-main
 done
 
 #######################################################################################################################################################################################################################################################################################################
+#Plot PCA & color by different factors
 
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
+echo ">"$species
 cd Length_bin_PCA_kmeans/"$species"/
 coding_status=$(readlink -f /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/"$species"/scfr_coding_status.tsv)
 repeat_class=$(readlink -f /media/aswin/SCFR/SCFR-main/repeat_masker/"$species"/"$species"_gt1000.fasta.out)
