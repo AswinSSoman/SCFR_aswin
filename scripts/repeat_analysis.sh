@@ -1,5 +1,5 @@
 
-#Run repeat masker (ran for 3 species using species library, for rest hominidiae is used as species)
+#Run repeat masker (ran for 3 species (chimpanzee, gorilla, human) using species library, for rest hominidiae is used as species)
 cd /media/aswin/SCFR/SCFR-main
 time for seq in $(find Length_threshold_PCA_kmeans/ -mindepth 3 -name "*_gt1000.fasta" -type f | xargs readlink -f | egrep "gibbon|borangutan|bonobo|sorangutan")
 do
