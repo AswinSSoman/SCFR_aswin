@@ -334,6 +334,34 @@ done | sed '1i Species Length_threshold PC1_PC2 k Silhouette DBI WCSS Curvature'
 
 
 
+#######################################################################################################################################################################################################################################################################################################
+
+#copy & collect pdf in one location for slide making
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+cd Length_threshold_PCA_kmeans/"$species"
+
+for lenthr in gt2500 gt5000 gt7500 gt10000
+do
+cd $lenthr
+mkdir -p /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/$lenthr
+
+for pdf in $(ls pca_*.pdf)
+do
+pc=$(echo $pdf | cut -f3,4 -d "_" | sed 's/\.pdf//g')
+col=$(echo $pdf | cut -f2 -d "_" | sed 's/\.pdf//g') 
+cp $pdf /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/$lenthr/"$species"_"$pc"_"$col".pdf
+unset pc col
+done
+
+cd ../
+done
+unset lenthr
+cd /media/aswin/SCFR/SCFR-main/
+done
+
+
 /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed
 bedtools intersect -a /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed -b 1000_2500.bed -wo > test
 
