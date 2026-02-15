@@ -341,7 +341,7 @@ Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R
 #Run PCA for genes
 
 cd /media/aswin/SCFR/SCFR-main/
-time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon
 do
 gene=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GCF_*_cds.fa)
 echo $species $gene
@@ -358,8 +358,8 @@ time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/kmeans_script.R . .
 #plot
 time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . . $species 14 10 2 genes
 time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . . "$species"_cds_longest_per_gene_composition.tsv $species 14 10 2 genes
+cd /media/aswin/SCFR/SCFR-main/
 done
-
 
 #######################################################################################################################################################################################################################################################################################################
 #DRAFT
