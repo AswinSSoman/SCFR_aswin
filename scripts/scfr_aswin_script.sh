@@ -804,7 +804,7 @@ awk '$13<0.05' gene_deserts/fishers_test/all_species_summary > gene_deserts/fish
 	echo -e "\n Total time taken:" && echo $elapsed_time | awk '{print"-days:",$NF/60/60/24,"\n","-hours:",$NF/60/60,"\n","-mins:",$NF/60,"\n","-secs:",$1}' | column -t | sed 's/^/   /g' && echo -e
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#9.2. #Get window-wise summary of SCFR count and length & it's overlap with whole genome & cds from all species (99.3667 mins)
+#9.2. Get window-wise summary of SCFR count and length & it's overlap with whole genome & cds from all species (99.3667 mins)
 
 cd /media/aswin/SCFR/SCFR-main
 start_time=$(date +%s)
@@ -1030,6 +1030,39 @@ do
 echo ">"$species
 awk '$6~"0.33"' Fourier_analysis/$species/all_length_thresholds_fourier_summary > Fourier_analysis/$species/3_periodicity_scfrs
 done
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Plot fourier frequency dendity
+
+cd /media/aswin/SCFR/SCFR-main
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+cd Fourier_analysis/"$species"/
+awk '$1=="without_coding_region"' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="without_coding_region" && $2==5000' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="without_coding_region" && $2==7500' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="without_coding_region" && $2==10000' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="with_coding_region"' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="with_coding_region" && $2==5000' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="with_coding_region" && $2==7500' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv
+awk '$1=="with_coding_region" && $2==10000' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv
+#plot
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_without_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.pdf
+#plot 
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_with_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.pdf
+
+cd /media/aswin/SCFR/SCFR-main
+done
+
+cd /media/aswin/SCFR/SCFR-main/shreya/Fourier/
+find Fourier_analysis/ -mindepth 2 -maxdepth 2 -name "*_region_all_length_thresholds_fourier_summary.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Fourier/'
 
 #Look at fourier periodicity in SCFRs located inside gene deserts
 
