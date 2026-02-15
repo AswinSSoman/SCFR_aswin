@@ -251,11 +251,13 @@ do
 echo " -"$lenbin
 cd $lenbin
 #plot PCA by color
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . .
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . .
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_input
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . . $gc
+if [[ "$lenbin" == "2500_5000" ]]; then point="3"; elif [[ "$lenbin" == "5000_7500" ]]; then point="6"; elif [[ "$lenbin" == "7500_10000" ]] || [[ "$lenbin" == "gt10000" ]]; then point="7"; else :; fi
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . . $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . . $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_input $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . . $gc $species 14 10 $point $lenbin
+unset point
 cd ../
 done
 unset lenbin coding_status repeat_class repeat_input
@@ -278,11 +280,13 @@ do
 echo " -"$lenbin
 cd $lenbin
 #plot PCA by color
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . .
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . .
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_input
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . . $gc
+if [[ "$lenbin" == "gt2500" ]]; then point="3"; elif [[ "$lenbin" == "gt5000" ]]; then point="6"; elif [[ "$lenbin" == "gt7500" ]] || [[ "$lenbin" == "gt10000" ]]; then point="7"; else :; fi
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R . . $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . . $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_coding_status.R . . $coding_status $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_repeat_family.R . . $repeat_input $species 14 10 $point $lenbin
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . . $gc $species 14 10 $point $lenbin
+unset point
 cd ../
 done
 unset lenbin coding_status repeat_class repeat_input
@@ -328,57 +332,61 @@ unset lenthr
 cd /media/aswin/SCFR/SCFR-main/
 done | sed '1i Species Length_threshold PC1_PC2 k Silhouette DBI WCSS Curvature' | sed 's/[ ]\+/\t/g' > /media/aswin/SCFR/SCFR-main/Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.tsv
 
+#Plot PCA comparison
 cd /media/aswin/SCFR/SCFR-main
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R Length_bin_PCA_kmeans/all_species_pca_clustering_summary.tsv Length_bin_PCA_kmeans/all_species_pca_clustering_summary.png
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.tsv Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.png
 
+#######################################################################################################################################################################################################################################################################################################
+#Run PCA for genes
 
-      
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+gene=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"/GCF_*_cds.fa)
+echo $species $gene
+mkdir -p PCA_genes/$species/
+cd PCA_genes/$species/
+#Filter genes
+time python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/filter_genes_for_PCA.py $gene "$species"_cds_longest_per_gene.fa
+#Calculate composition
+/media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh "$species"_cds_longest_per_gene.fa > "$species"_cds_longest_per_gene_composition.tsv
+#Run PCA
+time python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/corrected_rscu_calc.py . .
+time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/pca_script.R . .
+time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/kmeans_script.R . .
+#plot
+time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R . . $species 14 10 2 genes
+time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . . "$species"_cds_longest_per_gene_composition.tsv $species 14 10 2 genes
+done
 
 
 #######################################################################################################################################################################################################################################################################################################
+#DRAFT
 
 #copy & collect pdf in one location for slide making
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
 do
 cd Length_threshold_PCA_kmeans/"$species"
-
 for lenthr in gt2500 gt5000 gt7500 gt10000
 do
 cd $lenthr
-mkdir -p /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/$lenthr
-
-for pdf in $(ls pca_*.pdf)
+mkdir -p /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/
+for pdf in $(ls pca_*_PC1_PC2.pdf)
 do
 pc=$(echo $pdf | cut -f3,4 -d "_" | sed 's/\.pdf//g')
-col=$(echo $pdf | cut -f2 -d "_" | sed 's/\.pdf//g') 
-cp $pdf /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/$lenthr/"$species"_"$pc"_"$col".pdf
+col=$(echo $pdf | cut -f2 -d "_" | sed 's/\.pdf//g')
+cp $pdf /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/"$species"_"$lenthr"_"$pc"_"$col".pdf
 unset pc col
 done
-
+cp pca_loadings.tsv /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/$species/"$species"_"$lenthr"_pca_loadings.tsv
 cd ../
 done
 unset lenthr
 cd /media/aswin/SCFR/SCFR-main/
 done
 
-
-/media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed
-bedtools intersect -a /media/aswin/SCFR/SCFR-main/exon_shadow/gibbon/gibbon_coding_exons.bed -b 1000_2500.bed -wo > test
-
-
-
-cd /media/aswin/SCFR/SCFR-main/
-time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
-do
-for f in 1000_2500 2500_5000 5000_7500 7500_10000 gt10000
-do
-cd Length_bin_PCA_kmeans/"$species"/"$f"
-bedtools intersect -a ../"$f".bed -b /media/aswin/SCFR/SCFR-main/exon_shadow/$species/"$species"_coding_exons.bed -wo \
- | awk '$6$7==$17' | awk '{print$0,$3-$2,$16-$15,($20/($16-$15))*100}' | awk '{print$17"::"$14":"$15"-"$16"("$19")","in_frame_coding",$20,$21,$22,$23}' | awk 'NR==1; NR>1 {print $0}' | sort -k1,1 -k6,6rn | awk '!seen[$1]++' | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g' > scfr_coding_"$f".tsv
-bedtools intersect -a ../"$f".bed -b /media/aswin/SCFR/SCFR-main/exon_shadow/$species/"$species"_coding_exons.bed -wo \
- | awk '$6$7!=$17' | awk '{print$0,$3-$2,$16-$15,($20/($16-$15))*100}' | awk '{print$17"::"$14":"$15"-"$16"("$19")","out_frame_coding",$20,$21,$22,$23}' | awk 'NR==1; NR>1 {print $0}' test | sort -k1,1 -k6,6rn | awk '!seen[$1]++' | sed '1i SCFR coding_status overlap_len cds_len scfr_len percent_coding_in_scfr' | sed 's/[ ]\+/\t/g' > scfr_non_coding_"$f".tsv
 
 
 
