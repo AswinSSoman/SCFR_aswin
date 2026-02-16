@@ -371,8 +371,8 @@ gene=$(readlink -f /media/aswin/SCFR/SCFR-main/Fourier_analysis/genes/"$species"
 echo $species $gene
 mkdir -p PCA_genes/$species/
 cd PCA_genes/$species/
-#Filter genes
-time python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/filter_genes_for_PCA.py $gene "$species"_cds_longest_per_gene.fa
+#Filter genes (min length: 2500)
+time python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/filter_genes_for_PCA.py $gene "$species"_cds_longest_per_gene.fa 2500
 #Calculate composition
 /media/aswin/SCFR/SCFR-main/my_scripts/exon_shadow/get_composition.sh "$species"_cds_longest_per_gene.fa > "$species"_cds_longest_per_gene_composition.tsv
 #Run PCA
