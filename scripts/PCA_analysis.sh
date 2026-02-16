@@ -391,5 +391,6 @@ done
 
 
 
+
 find . -maxdepth 3 -mindepth 3  -name "*.fasta" -type f | xargs -n1 bash -c 'paste <(echo $0 | cut -f4 -d "/") <(grep -v ">" $0 | wc | awk "{print\$3-\$1}")' > total_fasta_length
 
