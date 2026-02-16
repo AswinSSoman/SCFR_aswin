@@ -1048,20 +1048,19 @@ awk '$1=="with_coding_region" && $2==5000' all_length_thresholds_fourier_summary
 awk '$1=="with_coding_region" && $2==7500' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv
 awk '$1=="with_coding_region" && $2==10000' all_length_thresholds_fourier_summary | sed '1i Coding_status Length_threshold chr SCFR_Name Num_Raw_Peaks Top_Peak_Count Frequencies Magnitudes Periods' | sed 's/[ ]\+/\t/g' > "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv
 #plot
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_without_coding_region_all_length_thresholds_fourier_summary.pdf
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.pdf
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.pdf
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.pdf
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_without_coding_region_all_length_thresholds_fourier_summary.pdf without_coding
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.pdf without_coding
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.pdf without_coding
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.pdf without_coding
 #plot 
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_with_coding_region_all_length_thresholds_fourier_summary.pdf
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.pdf
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.pdf
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.pdf
-
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_with_coding_region_all_length_thresholds_fourier_summary.pdf all
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.pdf all
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.pdf all
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.pdf all
 cd /media/aswin/SCFR/SCFR-main
 done
 
-cd /media/aswin/SCFR/SCFR-main/shreya/Fourier/
+mkdir -p /media/aswin/SCFR/SCFR-main/shreya/Fourier/
 find Fourier_analysis/ -mindepth 2 -maxdepth 2 -name "*_region_all_length_thresholds_fourier_summary.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Fourier/'
 
 #Look at fourier periodicity in SCFRs located inside gene deserts
