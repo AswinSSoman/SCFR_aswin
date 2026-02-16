@@ -1060,6 +1060,31 @@ Rscript /media/aswin/SCFR/SCFR-main/my_scripts/plot_fourier_frequencies.R "$spec
 cd /media/aswin/SCFR/SCFR-main
 done
 
+cd /media/aswin/SCFR/SCFR-main
+for species in human bonobo chimpanzee gorilla borangutan sorangutan gibbon
+do
+echo ">"$species
+mkdir -p Fourier_analysis/"$species"/table
+cd Fourier_analysis/"$species"/table
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_without_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_without_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_without_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_without_coding_region_all_length_thresholds_fourier_summary.tsv
+#plot 
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_with_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_5000_with_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_7500_with_coding_region_all_length_thresholds_fourier_summary.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/table_fourier_frequencies.R ../"$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv "$species"_10000_with_coding_region_all_length_thresholds_fourier_summary.tsv
+for t in $(ls *region_all_length_thresholds_fourier_summary.tsv)
+do
+t1=$(echo $t | awk -F "_" '{print$1,$2,$3}')
+awk -v t1="$t1" '{$1=t1; print}' $t | sed '1d'
+done | awk '{if($3=="with") $3="all"; else if($2=="with") $3="all"; else if($2=="without") $3="without_coding"; else if($3=="without") $3="without_coding"; print}' \
+| sed '1i species length_threshold SCFR_coding_content highest_peak second_highest_peak peak_difference dip modal_of_distribution' | sed 's/[ ]\+/\t/g' > "$species"_final_fourier_summary.tsv
+cd /media/aswin/SCFR/SCFR-main
+done
+find Fourier_analysis/ -mindepth 3 -maxdepth 3 -name "*_final_fourier_summary.tsv" -type f | xargs cat | awk '!a[$0]++' > Fourier_analysis/fourier_frequency_table.tsv
+
 mkdir -p /media/aswin/SCFR/SCFR-main/shreya/Fourier/
 find Fourier_analysis/ -mindepth 2 -maxdepth 2 -name "*_region_all_length_thresholds_fourier_summary.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Fourier/'
 
