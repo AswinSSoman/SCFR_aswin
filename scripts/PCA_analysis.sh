@@ -233,7 +233,7 @@ cd /media/aswin/SCFR/SCFR-main
 done
 
 #######################################################################################################################################################################################################################################################################################################
-#Plot PCA & color by different factors
+#Plot PCA clusters & color by different factors
 
 #For length bin
 cd /media/aswin/SCFR/SCFR-main/
@@ -294,6 +294,28 @@ cd /media/aswin/SCFR/SCFR-main/
 done
 
 #######################################################################################################################################################################################################################################################################################################
+#Plot PCA loadings
+
+#Visuzalize codons contribution & amino acids
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+echo ">"$species
+cd Length_threshold_PCA_kmeans/"$species"/
+for lenbin in gt2500 gt5000 gt7500 gt10000
+do
+echo " -"$lenbin
+cd $lenbin
+len=$(echo $lenbin | sed 's/gt//g')
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap.R pca_loadings.tsv "$species"_"$lenbin"_codon_loadings_heatmap.pdf "$species" "$len"
+unset len
+cd ../
+done
+unset lenbin
+cd /media/aswin/SCFR/SCFR-main/
+done
+
+#######################################################################################################################################################################################################################################################################################################
 #Summary of PCA at different lengths
 
 #Summary of Length bin
@@ -337,8 +359,10 @@ cd /media/aswin/SCFR/SCFR-main
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R Length_bin_PCA_kmeans/all_species_pca_clustering_summary.tsv Length_bin_PCA_kmeans/all_species_pca_clustering_summary.png
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_pca_clustering_summary.R Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.tsv Length_threshold_PCA_kmeans/all_species_pca_clustering_summary.png
 
+
 #######################################################################################################################################################################################################################################################################################################
 #Run PCA for genes
+#######################################################################################################################################################################################################################################################################################################
 
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon
@@ -361,8 +385,24 @@ time Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_GC_content.R . .
 cd /media/aswin/SCFR/SCFR-main/
 done
 
+#Plot PCA loadings of genes
+
+#Visuzalize codons contribution & amino acids
+cd /media/aswin/SCFR/SCFR-main/
+time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
+do
+echo ">"$species
+cd PCA_genes/$species/
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap.R pca_loadings.tsv "$species"_genes_codon_loadings_heatmap.pdf "$species"
+cd /media/aswin/SCFR/SCFR-main/
+done
+
+
+
 #######################################################################################################################################################################################################################################################################################################
 #DRAFT
+#######################################################################################################################################################################################################################################################################################################
+
 
 #copy & collect pdf in one location for slide making
 cd /media/aswin/SCFR/SCFR-main/
