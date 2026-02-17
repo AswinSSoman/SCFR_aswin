@@ -315,6 +315,10 @@ unset lenbin
 cd /media/aswin/SCFR/SCFR-main/
 done
 
+cd /media/aswin/SCFR/SCFR-main
+mkdir shreya/Length_threshold_PCA_kmeans/codon_loadings
+find Length_threshold_PCA_kmeans/ -name "*_codon_loadings_heatmap.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/codon_loadings/'
+
 #######################################################################################################################################################################################################################################################################################################
 #Summary of PCA at different lengths
 
