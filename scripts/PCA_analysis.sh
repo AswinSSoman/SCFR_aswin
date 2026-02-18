@@ -309,8 +309,9 @@ cd $lenbin
 len=$(echo $lenbin | sed 's/gt//g')
 #Plor heatmap of codon loadings
 #Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap.R pca_loadings.tsv "$species"_"$lenbin"_codon_loadings_heatmap.pdf "$species" "$len"
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 2 5 explained_variance.tsv
+#Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 2 5 explained_variance.tsv
 #Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 5 10  explained_variance.tsv
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_contribution_heatmap.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 2 5 explained_variance.tsv
 #Plot variance explained by top 10 PCs
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_variance_explained_stat.R explained_variance.tsv "$species"_"$lenbin"_top_10_PC_variance.pdf "$species" "$len"
 unset len
