@@ -322,11 +322,9 @@ cd /media/aswin/SCFR/SCFR-main/
 done
 
 cd /media/aswin/SCFR/SCFR-main
-mkdir shreya/Length_threshold_PCA_kmeans/codon_loadings
 mkdir shreya/Length_threshold_PCA_kmeans/top_codon_loadings
 mkdir shreya/Length_threshold_PCA_kmeans/top_PC_variance
-find Length_threshold_PCA_kmeans/ -name "*_codon_loadings_heatmap.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/codon_loadings/'
-find Length_threshold_PCA_kmeans/ -name "*_top_codon_loadings_heatmap.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/top_codon_loadings/'
+find Length_threshold_PCA_kmeans/ -name "*_top_codon_loadings_heatmap.pdf" -type f | grep -v "test" | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/top_codon_loadings/'
 find Length_threshold_PCA_kmeans/ -name "*_top_10_PC_variance.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/top_PC_variance/'
 
 #######################################################################################################################################################################################################################################################################################################
