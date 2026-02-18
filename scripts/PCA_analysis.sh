@@ -307,8 +307,12 @@ do
 echo " -"$lenbin
 cd $lenbin
 len=$(echo $lenbin | sed 's/gt//g')
+#Plor heatmap of codon loadings
 #Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap.R pca_loadings.tsv "$species"_"$lenbin"_codon_loadings_heatmap.pdf "$species" "$len"
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 2 5 explained_variance.tsv
+#Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap_updated.R pca_loadings.tsv "$species"_"$lenbin"_top_codon_loadings_heatmap.pdf "$species" "$len" 5 10  explained_variance.tsv
+#Plot variance explained by top 10 PCs
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_variance_explained_stat.R explained_variance.tsv "$species"_"$lenbin"_top_10_PC_variance.pdf "$species" "$len"
 unset len
 cd ../
 done
@@ -319,8 +323,10 @@ done
 cd /media/aswin/SCFR/SCFR-main
 mkdir shreya/Length_threshold_PCA_kmeans/codon_loadings
 mkdir shreya/Length_threshold_PCA_kmeans/top_codon_loadings
+mkdir shreya/Length_threshold_PCA_kmeans/top_PC_variance
 find Length_threshold_PCA_kmeans/ -name "*_codon_loadings_heatmap.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/codon_loadings/'
 find Length_threshold_PCA_kmeans/ -name "*_top_codon_loadings_heatmap.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/top_codon_loadings/'
+find Length_threshold_PCA_kmeans/ -name "*_top_10_PC_variance.pdf" -type f | xargs -n1 sh -c 'cp $0 /media/aswin/SCFR/SCFR-main/shreya/Length_threshold_PCA_kmeans/top_PC_variance/'
 
 #######################################################################################################################################################################################################################################################################################################
 #Summary of PCA at different lengths
