@@ -415,7 +415,6 @@ done
 #DRAFT
 #######################################################################################################################################################################################################################################################################################################
 
-
 #copy & collect pdf in one location for slide making
 cd /media/aswin/SCFR/SCFR-main/
 time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon 
@@ -441,8 +440,20 @@ done
 
 
 
-
-
+#Code to view the pca codon raw loadings & contribution
+awk '{print $1, $2, $3}' pca_loadings.tsv | awk 'NR==1 {print $0, "Sum_Abs"} NR>1 {abs2=($2<0?-$2:$2); abs3=($3<0?-$3:$3); print $0, abs2+abs3}' | awk 'NR==1 {print $0, "PC1_sq", "PC2_sq"} NR>1 {print $0, $2*$2, $3*$3}' | awk '
+  NR == 1 {header = $0 " Norm_PC1_sq Norm_PC2_sq"; next}
+  {
+    # Store each line in an array and accumulate sums
+    rows[NR] = $0
+    val5[NR] = $5
+    val6[NR] = $6
+    sum5 += $5
+    sum6 += $6}
+  END {print header
+    for (i = 2; i <= NR; i++) {
+      # Divide each stored row by the final sums
+      print rows[i], (val5[i]/sum5)*100, (val6[i]/sum6)*100}}' | column -t
 
 find . -maxdepth 3 -mindepth 3  -name "*.fasta" -type f | xargs -n1 bash -c 'paste <(echo $0 | cut -f4 -d "/") <(grep -v ">" $0 | wc | awk "{print\$3-\$1}")' > total_fasta_length
 
