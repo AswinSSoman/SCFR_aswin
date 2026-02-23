@@ -62,8 +62,6 @@ process_species() {
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/corrected_rscu_calc.py "$OUTDIR" "$OUTDIR"
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/pca_script.R "$OUTDIR" "$OUTDIR"
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/kmeans_script.R "$OUTDIR" "$OUTDIR"
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R "$OUTDIR" "$OUTDIR"
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R "$OUTDIR" "$OUTDIR"
   done
 }
 export -f process_species
@@ -144,8 +142,6 @@ process_species_threshold() {
 python3 /media/aswin/SCFR/SCFR-main/my_scripts/PCA/corrected_rscu_calc.py "$OUTDIR" "$OUTDIR"
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/pca_script.R "$OUTDIR" "$OUTDIR"
 Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/kmeans_script.R "$OUTDIR" "$OUTDIR"
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_by_cluster.R "$OUTDIR" "$OUTDIR"
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_color_by_clade.R "$OUTDIR" "$OUTDIR"
   done
 }
 export -f process_species_threshold
@@ -405,7 +401,7 @@ time for species in human bonobo borangutan sorangutan chimpanzee gorilla gibbon
 do
 echo ">"$species
 cd PCA_genes/$species/
-Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_heatmap.R pca_loadings.tsv "$species"_genes_codon_loadings_heatmap.pdf "$species"
+Rscript /media/aswin/SCFR/SCFR-main/my_scripts/PCA/plot_codon_contribution_heatmap.R pca_loadings.tsv "$species"_genes_codon_loadings_heatmap.pdf "$species"
 cd /media/aswin/SCFR/SCFR-main/
 done
 
